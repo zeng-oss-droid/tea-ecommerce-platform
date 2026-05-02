@@ -1,220 +1,225 @@
-# 茶叶电商平台
+# 茶叶电商平台（Tea E-Commerce Platform）
 
-一个基于 Spring Boot + Vue.js 的茶叶电商平台，实现完整的在线购物功能。
+前后端分离的茶叶主题电商系统：用户浏览下单、商家管理店铺、管理员运营全站。后端提供 REST API，前端使用 Vite 开发、生产构建后可由 Nginx 或 Spring 静态资源托管。
+
+**在线仓库：** [https://github.com/zeng-oss-droid/tea-ecommerce-platform](https://github.com/zeng-oss-droid/tea-ecommerce-platform)
+
+---
 
 ## 技术栈
 
-### 后端
-- Spring Boot 3.5.8
-- MyBatis 3.0.5
-- MySQL 8.0
-- Redis
-- JWT 认证
-- Maven
+| 层级 | 技术 |
+|------|------|
+| 后端 | Spring Boot **3.5.x**、MyBatis **3.0.x**、MySQL 8、Redis、JWT（jjwt）、Maven |
+| 前端 | Vue **3**、Vue Router **4**、Pinia、Element Plus、Axios、**ECharts**、Vite **5** |
+| 安全 | 密码 **MD5** 存储（演示用）；接口层 JWT 解析 + 管理端路径单独鉴权 |
 
-### 前端
-- Vue 3
-- Vue Router 4
-- Pinia
-- Element Plus
-- Axios
-- Vite
+---
 
-## 功能模块
+## 角色说明
 
-### 用户管理模块
-- 用户注册
-- 用户登录（JWT认证）
-- 个人信息管理
-- 密码修改
+| role | 说明 | 主要入口 |
+|------|------|----------|
+| `0` | 普通用户 | 商城、购物车、订单、个人中心、申请入驻 |
+| `1` | 管理员 | `/admin/*` 管理后台（用户、商品、分类、订单、退款、评论、商家申请等） |
+| `2` | 商家 | `/merchant/*` 商家工作台（本店商品、订单、退款） |
 
-### 商品管理模块
-- 商品展示
-- 商品分类浏览
-- 商品搜索筛选
-- 商品详情查看
+商家入驻资料与申请状态保存在 **`user` 表**的商户相关字段中（无单独「申请表」）。
 
-### 交易管理模块
-- 购物车管理
-- 订单创建
-- 在线支付（模拟）
-- 订单状态跟踪
+---
 
-### 订单管理模块
-- 订单查询
-- 订单详情查看
-- 订单取消
-- 确认收货
+## 功能概览
 
-### 物流管理模块
-- 收货地址管理
-- 物流信息查询
-- 配送跟踪
+### 前台（用户）
 
-## 项目结构
+- 首页、商品列表/搜索/筛选、商品详情  
+- 购物车、收货地址、下单、模拟支付、取消订单、确认收货、订单详情  
+- 注册、登录（JWT）、个人资料、修改密码  
+- **加入我们**：提交商家入驻申请  
+- **茶文化**、个人中心等页面  
+
+### 售后与互动
+
+- **退款**：发起退款、我的退款、填写退货物流、取消申请（具体状态以后端为准）  
+- **评价**：订单完成后评价、按商品查看评价、我的评价  
+
+### 管理后台（管理员）
+
+- **数据统计**：仪表盘（ECharts 等全站概览）  
+- **订单 / 退款 / 评论** 管理与审核流程  
+- **商品 / 分类** 维护（全站商品）  
+- **用户管理**：启用禁用、角色调整、删除用户  
+- **商家申请**：审核通过/驳回、**删除申请记录**（待审/驳回，清空入驻字段；已通过需先处理角色）  
+
+### 商家工作台
+
+- 本店商品 CRUD、本店订单发货与状态、本店相关退款处理  
+
+### 其它
+
+- 图片本地上传（`uploads/`，配置见 `application.properties`）  
+- 物流信息维护与查询（`logistics`）  
+
+---
+
+## 项目结构（摘要）
 
 ```
 tea-ecommerce-platform/
-├── src/                          # 后端源码
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/reservation/teaecommerceplatform/
-│   │   │       ├── common/       # 通用类
-│   │   │       ├── config/       # 配置类
-│   │   │       ├── controller/   # 控制器
-│   │   │       ├── dto/          # 数据传输对象
-│   │   │       ├── entity/       # 实体类
-│   │   │       ├── interceptor/  # 拦截器
-│   │   │       ├── mapper/       # Mapper接口
-│   │   │       ├── service/      # 服务层
-│   │   │       └── util/         # 工具类
-│   │   └── resources/
-│   │       ├── mapper/           # MyBatis XML映射文件
-│   │       ├── db/               # 数据库脚本
-│   │       └── application.properties
-│   └── test/
-├── frontend/                      # 前端源码
-│   ├── src/
-│   │   ├── layouts/              # 布局组件
-│   │   ├── views/                # 页面组件
-│   │   ├── stores/               # Pinia状态管理
-│   │   ├── router/               # 路由配置
-│   │   └── utils/                # 工具函数
+├── pom.xml                          # 后端 Maven
+├── src/main/java/.../
+│   ├── TeaEcommercePlatformApplication.java
+│   ├── package-info.java            # 包级说明（分层约定）
+│   ├── common/                      # 统一响应 Result
+│   ├── config/                      # Web、CORS、Redis
+│   ├── controller/                  # REST（user、product、order、admin、merchant…）
+│   ├── service/ / service/impl/
+│   ├── mapper/                      # MyBatis 接口
+│   ├── entity/、dto/、interceptor/、util/
+├── src/main/resources/
+│   ├── application.properties       # 数据源、Redis、JWT、上传路径等
+│   ├── mapper/*.xml                 # MyBatis SQL
+│   └── db/
+│       ├── tea_ecommerce.sql        # 推荐：完整表结构 + 演示数据
+│       └── init.sql                 # 较早建库脚本（若与现网不一致请以 tea_ecommerce.sql 为准）
+├── frontend/
 │   ├── package.json
-│   └── vite.config.js
+│   ├── vite.config.js               # 开发代理 /api -> localhost:8080
+│   └── src/
+│       ├── layouts/                 # MainLayout、AdminLayout（含商家布局复用）
+│       ├── views/、views/admin/
+│       ├── router/、stores/、utils/
 └── README.md
 ```
 
-## 快速开始
+---
 
-### 环境要求
-- JDK 17+
-- Maven 3.6+
-- MySQL 8.0+
-- Redis 6.0+
-- Node.js 16+
+## 环境要求
 
-### 后端启动
+- **JDK 17+**  
+- **Maven 3.6+**（或使用项目自带 `mvnw`）  
+- **MySQL 8.0+**  
+- **Redis**（与 `application.properties` 中配置一致）  
+- **Node.js 18+**（建议 LTS，用于前端）
 
-1. 创建数据库并执行初始化脚本
-```sql
--- 执行 src/main/resources/db/init.sql
-```
+---
 
-2. 修改数据库配置
-编辑 `src/main/resources/application.properties`，修改数据库连接信息：
-```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/tea_ecommerce?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
-spring.datasource.username=root
-spring.datasource.password=your_password
-```
+## 数据库初始化（推荐）
 
-3. 启动Redis服务
+1. 在 MySQL 中创建库（若脚本未包含建库语句可手动建）：`tea_ecommerce`  
+2. 导入 **`src/main/resources/db/tea_ecommerce.sql`**（含表结构与演示数据）。  
 
-4. 运行项目
+> 若使用仓库中的 **`init.sql`**，表结构可能与当前代码演进不一致，**优先以 `tea_ecommerce.sql` 为准**。
+
+### 演示账号说明
+
+- 脚本中部分普通用户的密码哈希为 `0192023a7bbd73250516f069df18b500`，对应明文 **`admin123`**（与 `init.sql` 注释一致，便于本地演示）。  
+- 管理员 **`admin`** 在 `tea_ecommerce.sql` 中的哈希与其它用户不同；**若无法登录**，可在库中将其 `password` 更新为上述 MD5 值，或自行生成 MD5 后更新。  
+
+**切勿**将含真实密码的 `application.properties` 提交到公开仓库；生产环境请用环境变量或 `application-local.properties`（并加入 `.gitignore`）。
+
+---
+
+## 配置说明
+
+编辑 **`src/main/resources/application.properties`**：
+
+| 配置项 | 含义 |
+|--------|------|
+| `spring.datasource.*` | MySQL 连接 |
+| `spring.data.redis.*` | Redis |
+| `jwt.secret` / `jwt.expiration` | JWT 签名与过期时间 |
+| `file.upload.path` / `file.upload.url` | 本地上传目录与对外访问 URL 前缀 |
+| `spring.web.cors.allowed-origins` | 允许的前端源（默认含 `http://localhost:5173`） |
+
+---
+
+## 启动步骤
+
+### 1. 启动 Redis 与 MySQL
+
+确保 Redis、MySQL 已运行，且库表已按上文导入。
+
+### 2. 启动后端
+
+在项目根目录：
+
 ```bash
 mvn spring-boot:run
 ```
 
-后端服务将在 `http://localhost:8080` 启动
+默认：**http://localhost:8080**
 
-### 前端启动
+### 3. 启动前端
 
-1. 进入前端目录
 ```bash
 cd frontend
-```
-
-2. 安装依赖
-```bash
 npm install
-```
-
-3. 启动开发服务器
-```bash
 npm run dev
 ```
 
-前端服务将在 `http://localhost:5173` 启动
+默认：**http://localhost:5173**（`vite.config.js` 已将 `/api` 代理到 `8080`）
 
-## API接口
+### 4. 生产构建（前端）
 
-### 用户相关
-- `POST /api/user/register` - 用户注册
-- `POST /api/user/login` - 用户登录
-- `GET /api/user/info` - 获取当前用户信息
-- `PUT /api/user/info` - 更新用户信息
-- `PUT /api/user/password` - 修改密码
+```bash
+cd frontend
+npm run build
+```
 
-### 商品相关
-- `GET /api/product/list` - 获取商品列表
-- `GET /api/product/detail/{id}` - 获取商品详情
-- `POST /api/product/add` - 添加商品（管理员）
-- `PUT /api/product/update` - 更新商品（管理员）
-- `DELETE /api/product/delete/{id}` - 删除商品（管理员）
+产物在 `frontend/dist/`，可由任意静态服务器或网关反代。
 
-### 分类相关
-- `GET /api/category/list` - 获取分类列表
-- `GET /api/category/{id}` - 获取分类详情
+---
 
-### 购物车相关
-- `GET /api/cart/list` - 获取购物车列表
-- `POST /api/cart/add` - 添加到购物车
-- `PUT /api/cart/update` - 更新购物车商品数量
-- `DELETE /api/cart/remove/{cartId}` - 删除购物车商品
-- `DELETE /api/cart/clear` - 清空购物车
+## 主要 API 前缀（节选）
 
-### 订单相关
-- `POST /api/order/create` - 创建订单
-- `GET /api/order/list` - 获取订单列表
-- `GET /api/order/detail/{orderId}` - 获取订单详情
-- `POST /api/order/pay` - 支付订单
-- `POST /api/order/cancel/{orderId}` - 取消订单
-- `POST /api/order/confirm/{orderId}` - 确认收货
+| 前缀 | 说明 |
+|------|------|
+| `/api/user/*` | 注册、登录、资料、密码、商家入驻申请 |
+| `/api/product/*` | 商品列表/详情（部分匿名）、增删改（管理员/商家） |
+| `/api/category/*` | 分类；写操作需管理员 |
+| `/api/cart/*`、`/api/order/*`、`/api/address/*` | 购物车、订单、地址 |
+| `/api/refund/*`、`/api/review/*` | 退款、评价 |
+| `/api/admin/*` | 管理端（需管理员 JWT） |
+| `/api/merchant/*` | 商家端（需商家 JWT） |
+| `/api/upload/*` | 图片上传（与 `WebConfig` 中拦截规则一致） |
 
-### 地址相关
-- `GET /api/address/list` - 获取地址列表
-- `POST /api/address/add` - 添加地址
-- `PUT /api/address/update` - 更新地址
-- `POST /api/address/setDefault` - 设置默认地址
-- `DELETE /api/address/delete/{id}` - 删除地址
+完整路径见各 `*Controller.java`。
 
-## 数据库设计
+---
 
-主要数据表：
-- `user` - 用户表
-- `category` - 商品分类表
-- `product` - 商品表
-- `cart` - 购物车表
-- `order` - 订单表
-- `order_item` - 订单项表
-- `address` - 收货地址表
-- `logistics` - 物流信息表
+## 数据表一览
 
-## 默认账号
+| 表名 | 说明 |
+|------|------|
+| `user` | 用户、角色、商家入驻字段 |
+| `category`、`product` | 分类与商品（含 `seller_id`） |
+| `cart`、`address` | 购物车、收货地址 |
+| `order`、`order_item` | 订单与明细 |
+| `refund` | 退款单 |
+| `review` | 商品评价 |
+| `logistics` | 物流信息 |
 
-管理员账号：
-- 用户名：admin
-- 密码：admin123
+---
 
 ## 注意事项
 
-1. 确保MySQL和Redis服务已启动
-2. 首次运行需要执行数据库初始化脚本
-3. 前端开发服务器已配置代理，API请求会自动转发到后端
-4. JWT token存储在localStorage中，刷新页面不会丢失登录状态
+1. **Redis** 未启动时，依赖 Redis 的接口可能失败，请先启动 Redis。  
+2. **JWT** 存于前端 `localStorage`（见 `stores/user.js`），刷新页面可保持登录（未过期前提下）。  
+3. **HTTPS / Git**：若本机 Git 访问 GitHub 报 SSL 错误，可配置 `http.sslBackend schannel`（Windows）或按公司要求导入根证书。  
+4. **公开仓库**：务必移除或脱敏数据库密码、JWT `secret` 等敏感配置。  
 
-## 开发计划
+---
 
-- [ ] 完善支付功能对接
-- [ ] 实现物流信息实时查询
-- [ ] 添加商品评价功能
-- [ ] 实现优惠券系统
-- [ ] 添加数据统计功能
-- [ ] 优化前端UI/UX
-- [ ] 添加单元测试
+## 后续可扩展方向（非必须）
+
+- 对接真实支付、短信/邮件  
+- 统一全局异常与 API 文档（SpringDoc）  
+- 优惠券、库存预警、导出报表  
+- 更细的操作审计日志  
+
+---
 
 ## 许可证
 
 MIT License
-
