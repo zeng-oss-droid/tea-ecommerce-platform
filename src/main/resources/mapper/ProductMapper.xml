@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 商品表 product：动态条件分页、上下架筛选、卖家维度 -->
+<mapper namespace="com.reservation.teaecommerceplatform.mapper.ProductMapper">
+    
+    <resultMap id="BaseResultMap" type="com.reservation.teaecommerceplatform.entity.Product">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="description" property="description"/>
+        <result column="detail" property="detail"/>
+        <result column="price" property="price"/>
+        <result column="original_price" property="originalPrice"/>
+        <result column="stock" property="stock"/>
+        <result column="images" property="images"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="origin" property="origin"/>
+        <result column="process" property="process"/>
+        <result column="grade" property="grade"/>
+        <result column="sales" property="sales"/>
+        <result column="status" property="status"/>
+        <result column="seller_id" property="sellerId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM product WHERE id = #{id}
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT * FROM product
+        <where>
+            <if test="includeDisabled == null or includeDisabled == false">
+                status = 1
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (name LIKE CONCAT('%', #{keyword}, '%') OR description LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="categoryId != null">
+                AND category_id = #{categoryId}
+            </if>
+            <if test="minPrice != null">
+                AND price &gt;= #{minPrice}
+            </if>
+            <if test="maxPrice != null">
+                AND price &lt;= #{maxPrice}
+            </if>
+            <if test="sellerId != null">
+                AND seller_id = #{sellerId}
+            </if>
+        </where>
+        <choose>
+            <when test="sortBy == 'price'">
+                ORDER BY price <if test="sortOrder == 'desc'">DESC</if><if test="sortOrder == 'asc'">ASC</if>
+            </when>
+            <when test="sortBy == 'sales'">
+                ORDER BY sales <if test="sortOrder == 'desc'">DESC</if><if test="sortOrder == 'asc'">ASC</if>
+            </when>
+            <otherwise>
+                ORDER BY create_time DESC
+            </otherwise>
+        </choose>
+        <bind name="offset" value="(pageNum - 1) * pageSize" />
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT COUNT(*) FROM product
+        <where>
+            <if test="includeDisabled == null or includeDisabled == false">
+                status = 1
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (name LIKE CONCAT('%', #{keyword}, '%') OR description LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="categoryId != null">
+                AND category_id = #{categoryId}
+            </if>
+            <if test="minPrice != null">
+                AND price &gt;= #{minPrice}
+            </if>
+            <if test="maxPrice != null">
+                AND price &lt;= #{maxPrice}
+            </if>
+            <if test="sellerId != null">
+                AND seller_id = #{sellerId}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO product (name, description, detail, price, original_price, stock, images, category_id, origin, process, grade, sales, status, seller_id, create_time, update_time)
+        VALUES (#{name}, #{description}, #{detail}, #{price}, #{originalPrice}, #{stock}, #{images}, #{categoryId}, #{origin}, #{process}, #{grade}, #{sales}, #{status}, #{sellerId}, NOW(), NOW())
+    </insert>
+
+    <update id="update">
+        UPDATE product
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="detail != null">detail = #{detail},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="originalPrice != null">original_price = #{originalPrice},</if>
+            <if test="stock != null">stock = #{stock},</if>
+            <if test="images != null">images = #{images},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="origin != null">origin = #{origin},</if>
+            <if test="process != null">process = #{process},</if>
+            <if test="grade != null">grade = #{grade},</if>
+            <if test="sales != null">sales = #{sales},</if>
+            <if test="status != null">status = #{status},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateStock">
+        UPDATE product SET stock = stock - #{quantity} WHERE id = #{id}
+    </update>
+
+    <update id="updateSales">
+        UPDATE product SET sales = sales + #{quantity} WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM product WHERE id = #{id}
+    </delete>
+
+</mapper>
+

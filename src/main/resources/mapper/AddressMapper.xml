@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 用户收货地址 address -->
+<mapper namespace="com.reservation.teaecommerceplatform.mapper.AddressMapper">
+    
+    <resultMap id="BaseResultMap" type="com.reservation.teaecommerceplatform.entity.Address">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="receiver_name" property="receiverName"/>
+        <result column="receiver_phone" property="receiverPhone"/>
+        <result column="province" property="province"/>
+        <result column="city" property="city"/>
+        <result column="district" property="district"/>
+        <result column="detail_address" property="detailAddress"/>
+        <result column="postal_code" property="postalCode"/>
+        <result column="is_default" property="isDefault"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM address WHERE id = #{id}
+    </select>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT * FROM address WHERE user_id = #{userId} ORDER BY is_default DESC, create_time DESC
+    </select>
+
+    <select id="selectDefaultByUserId" resultMap="BaseResultMap">
+        SELECT * FROM address WHERE user_id = #{userId} AND is_default = 1 LIMIT 1
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO address (user_id, receiver_name, receiver_phone, province, city, district, detail_address, postal_code, is_default, create_time, update_time)
+        VALUES (#{userId}, #{receiverName}, #{receiverPhone}, #{province}, #{city}, #{district}, #{detailAddress}, #{postalCode}, #{isDefault}, NOW(), NOW())
+    </insert>
+
+    <update id="update">
+        UPDATE address
+        <set>
+            <if test="receiverName != null">receiver_name = #{receiverName},</if>
+            <if test="receiverPhone != null">receiver_phone = #{receiverPhone},</if>
+            <if test="province != null">province = #{province},</if>
+            <if test="city != null">city = #{city},</if>
+            <if test="district != null">district = #{district},</if>
+            <if test="detailAddress != null">detail_address = #{detailAddress},</if>
+            <if test="postalCode != null">postal_code = #{postalCode},</if>
+            <if test="isDefault != null">is_default = #{isDefault},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateDefault">
+        UPDATE address SET is_default = 1, update_time = NOW() WHERE id = #{id} AND user_id = #{userId}
+    </update>
+
+    <update id="cancelDefault">
+        UPDATE address SET is_default = 0, update_time = NOW() WHERE user_id = #{userId}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM address WHERE id = #{id}
+    </delete>
+
+</mapper>
+

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 订单主表 order：用户单、后台全量、卖家订单、统计 -->
+<mapper namespace="com.reservation.teaecommerceplatform.mapper.OrderMapper">
+    
+    <resultMap id="BaseResultMap" type="com.reservation.teaecommerceplatform.entity.Order">
+        <id column="id" property="id"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="user_id" property="userId"/>
+        <result column="address_id" property="addressId"/>
+        <result column="total_amount" property="totalAmount"/>
+        <result column="discount_amount" property="discountAmount"/>
+        <result column="pay_amount" property="payAmount"/>
+        <result column="status" property="status"/>
+        <result column="pay_type" property="payType"/>
+        <result column="pay_time" property="payTime"/>
+        <result column="logistics_no" property="logisticsNo"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM `order` WHERE id = #{id}
+    </select>
+
+    <select id="selectByOrderNo" resultMap="BaseResultMap">
+        SELECT * FROM `order` WHERE order_no = #{orderNo}
+    </select>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT * FROM `order` WHERE user_id = #{userId} ORDER BY create_time DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `order` (order_no, user_id, address_id, total_amount, discount_amount, pay_amount, status, pay_type, pay_time, logistics_no, remark, create_time, update_time)
+        VALUES (#{orderNo}, #{userId}, #{addressId}, #{totalAmount}, #{discountAmount}, #{payAmount}, #{status}, #{payType}, #{payTime}, #{logisticsNo}, #{remark}, NOW(), NOW())
+    </insert>
+
+    <update id="update">
+        UPDATE `order`
+        <set>
+            <if test="addressId != null">address_id = #{addressId},</if>
+            <if test="totalAmount != null">total_amount = #{totalAmount},</if>
+            <if test="discountAmount != null">discount_amount = #{discountAmount},</if>
+            <if test="payAmount != null">pay_amount = #{payAmount},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="payType != null">pay_type = #{payType},</if>
+            <if test="payTime != null">pay_time = #{payTime},</if>
+            <if test="logisticsNo != null">logistics_no = #{logisticsNo},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE `order` SET status = #{status}, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <!-- 管理员功能 -->
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM `order`
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (order_no LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*) FROM `order`
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (order_no LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectAllBySellerId" resultMap="BaseResultMap">
+        SELECT o.* FROM `order` o
+        INNER JOIN order_item oi ON o.id = oi.order_id
+        <where>
+            oi.seller_id = #{sellerId}
+            <if test="keyword != null and keyword != ''">
+                AND (o.order_no LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="status != null">
+                AND o.status = #{status}
+            </if>
+        </where>
+        GROUP BY o.id
+        ORDER BY o.create_time DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countAllBySellerId" resultType="int">
+        SELECT COUNT(DISTINCT o.id) FROM `order` o
+        INNER JOIN order_item oi ON o.id = oi.order_id
+        <where>
+            oi.seller_id = #{sellerId}
+            <if test="keyword != null and keyword != ''">
+                AND (o.order_no LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="status != null">
+                AND o.status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <select id="countTotal" resultType="int">
+        SELECT COUNT(*) FROM `order`
+    </select>
+
+    <select id="sumTotalSales" resultType="java.math.BigDecimal">
+        SELECT COALESCE(SUM(pay_amount), 0) FROM `order` WHERE status IN (1, 2, 3)
+    </select>
+
+    <select id="countByStatus" resultType="int">
+        SELECT COUNT(*) FROM `order` WHERE status = #{status}
+    </select>
+
+</mapper>
+

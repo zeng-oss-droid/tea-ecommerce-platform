@@ -1,0 +1,82 @@
+:root {
+  /* 主色调 RGB(188, 56, 35) = #bc3823 */
+  --primary-color: #bc3823;
+  --primary-dark: #9d2d1c;
+  --primary-light: #d45a47;
+  /* 复色调 RGB(251, 204, 141) = #fbcc8d */
+  --secondary-color: #fbcc8d;
+  --secondary-light: #fdd9b0;
+  --secondary-dark: #f9bf6a;
+  --success-color: #52c41a;
+  --warning-color: #faad14;
+  --danger-color: #ff4d4f;
+  --text-primary: #262626;
+  --text-secondary: #595959;
+  --text-tertiary: #8c8c8c;
+  --bg-primary: #ffffff;
+  --bg-secondary: #fafafa;
+  --border-color: #d9d9d9;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.15);
+  
+  /* Element Plus 主题色 */
+  --el-color-primary: #bc3823;
+  --el-color-primary-light-3: #d45a47;
+  --el-color-primary-light-5: #e67c6b;
+  --el-color-primary-light-7: #f19e8f;
+  --el-color-primary-light-8: #f5b5a9;
+  --el-color-primary-light-9: #fef5f3;
+  --el-color-primary-dark-2: #9d2d1c;
+  --el-color-success: #52c41a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+
+/* Element Plus 按钮样式覆盖 */
+.el-button--primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.el-button--primary:hover {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+.el-button--success {
+  background-color: var(--success-color);
+  border-color: var(--success-color);
+}
+
+/* Element Plus 链接样式 */
+.el-link--primary {
+  color: var(--primary-color);
+}
+
+.el-link--primary:hover {
+  color: var(--primary-dark);
+}
+
+/* Element Plus 标签页样式 */
+.el-tabs__active-bar {
+  background-color: var(--primary-color);
+}
+
+.el-tabs__item.is-active {
+  color: var(--primary-color);
+}
+
+.el-tabs__item:hover {
+  color: var(--primary-color);
+}
+

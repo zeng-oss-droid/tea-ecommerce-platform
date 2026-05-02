@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  UserMapper：user 表 CRUD + 管理员列表 + 商家入驻（申请状态与店铺信息同事存在 user 行）
+-->
+<mapper namespace="com.reservation.teaecommerceplatform.mapper.UserMapper">
+
+    <!-- 列名 snake_case 映射到实体 camelCase -->
+    <resultMap id="BaseResultMap" type="com.reservation.teaecommerceplatform.entity.User">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="email" property="email"/>
+        <result column="phone" property="phone"/>
+        <result column="nickname" property="nickname"/>
+        <result column="avatar" property="avatar"/>
+        <result column="gender" property="gender"/>
+        <result column="status" property="status"/>
+        <result column="role" property="role"/>
+        <result column="merchant_name" property="merchantName"/>
+        <result column="contact_name" property="contactName"/>
+        <result column="contact_phone" property="contactPhone"/>
+        <result column="business_scope" property="businessScope"/>
+        <result column="merchant_intro" property="merchantIntro"/>
+        <result column="merchant_apply_status" property="merchantApplyStatus"/>
+        <result column="merchant_apply_reject_reason" property="merchantApplyRejectReason"/>
+        <result column="merchant_apply_time" property="merchantApplyTime"/>
+        <result column="merchant_review_time" property="merchantReviewTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- —— 基础查询 —— -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM user WHERE id = #{id}
+    </select>
+
+    <select id="selectByUsername" resultMap="BaseResultMap">
+        SELECT * FROM user WHERE username = #{username}
+    </select>
+
+    <select id="selectByEmail" resultMap="BaseResultMap">
+        SELECT * FROM user WHERE email = #{email}
+    </select>
+
+    <!-- —— 后台用户分页 —— -->
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT * FROM user
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (username LIKE CONCAT('%', #{keyword}, '%') 
+                OR nickname LIKE CONCAT('%', #{keyword}, '%')
+                OR email LIKE CONCAT('%', #{keyword}, '%')
+                OR phone LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY create_time DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT COUNT(*) FROM user
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (username LIKE CONCAT('%', #{keyword}, '%') 
+                OR nickname LIKE CONCAT('%', #{keyword}, '%')
+                OR email LIKE CONCAT('%', #{keyword}, '%')
+                OR phone LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user (username, password, email, phone, nickname, avatar, gender, status, role, merchant_name, contact_name, contact_phone, business_scope, merchant_intro, create_time, update_time)
+        VALUES (#{username}, #{password}, #{email}, #{phone}, #{nickname}, #{avatar}, #{gender}, #{status}, #{role}, #{merchantName}, #{contactName}, #{contactPhone}, #{businessScope}, #{merchantIntro}, NOW(), NOW())
+    </insert>
+
+    <!-- 个人资料动态字段更新 -->
+    <update id="update">
+        UPDATE user
+        <set>
+            <if test="email != null">email = #{email},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="nickname != null">nickname = #{nickname},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="status != null">status = #{status},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updatePassword">
+        UPDATE user SET password = #{password}, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE user SET status = #{status}, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="updateRole">
+        UPDATE user
+        SET role = #{role},
+            update_time = NOW()
+        WHERE id = #{id} AND role != 1
+    </update>
+
+    <!-- 用户端提交入驻：写店铺信息 + merchant_apply_status=1（待审核） -->
+    <update id="updateMerchantInfo">
+        UPDATE user
+        SET merchant_name = #{merchantName},
+            contact_name = #{contactName},
+            contact_phone = #{contactPhone},
+            business_scope = #{businessScope},
+            merchant_intro = #{merchantIntro},
+            merchant_apply_status = 1,
+            merchant_apply_reject_reason = NULL,
+            merchant_apply_time = NOW(),
+            merchant_review_time = NULL,
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 后台「商家申请」列表：只显示有过流程的记录（1待审 2通过 3驳回），0未申请不出现 -->
+    <select id="selectMerchantApplicationList" resultMap="BaseResultMap">
+        SELECT * FROM user
+        <where>
+            merchant_apply_status IN (1, 2, 3)
+            <if test="status != null">
+                AND merchant_apply_status = #{status}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (username LIKE CONCAT('%', #{keyword}, '%')
+                OR nickname LIKE CONCAT('%', #{keyword}, '%')
+                OR merchant_name LIKE CONCAT('%', #{keyword}, '%')
+                OR contact_name LIKE CONCAT('%', #{keyword}, '%')
+                OR contact_phone LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY merchant_apply_time DESC, id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countMerchantApplication" resultType="int">
+        SELECT COUNT(*) FROM user
+        <where>
+            merchant_apply_status IN (1, 2, 3)
+            <if test="status != null">
+                AND merchant_apply_status = #{status}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (username LIKE CONCAT('%', #{keyword}, '%')
+                OR nickname LIKE CONCAT('%', #{keyword}, '%')
+                OR merchant_name LIKE CONCAT('%', #{keyword}, '%')
+                OR contact_name LIKE CONCAT('%', #{keyword}, '%')
+                OR contact_phone LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+    </select>
+
+    <!-- 审核通过：role=2 商家，状态=2；WHERE 保证并发下只有待审能改 -->
+    <update id="approveMerchantApplication">
+        UPDATE user
+        SET role = 2,
+            merchant_apply_status = 2,
+            merchant_apply_reject_reason = NULL,
+            merchant_review_time = NOW(),
+            update_time = NOW()
+        WHERE id = #{id} AND merchant_apply_status = 1
+    </update>
+
+    <!-- 审核驳回：role 回到 0，状态=3，写入驳回原因 -->
+    <update id="rejectMerchantApplication">
+        UPDATE user
+        SET role = 0,
+            merchant_apply_status = 3,
+            merchant_apply_reject_reason = #{rejectReason},
+            merchant_review_time = NOW(),
+            update_time = NOW()
+        WHERE id = #{id} AND merchant_apply_status = 1
+    </update>
+
+    <!-- 管理员删除申请记录：清空商户列 + status=0；仅 1、3 可执行，避免动已通过商家 -->
+    <update id="clearMerchantApplication">
+        UPDATE user
+        SET merchant_name = NULL,
+            contact_name = NULL,
+            contact_phone = NULL,
+            business_scope = NULL,
+            merchant_intro = NULL,
+            merchant_apply_status = 0,
+            merchant_apply_reject_reason = NULL,
+            merchant_apply_time = NULL,
+            merchant_review_time = NULL,
+            update_time = NOW()
+        WHERE id = #{id} AND merchant_apply_status IN (1, 3)
+    </update>
+
+    <!-- 删除用户行（保护管理员） -->
+    <delete id="delete">
+        DELETE FROM user WHERE id = #{id} AND role != 1
+    </delete>
+
+</mapper>

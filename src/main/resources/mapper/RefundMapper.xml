@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 退款单 refund：用户/全站/卖家分页 -->
+<mapper namespace="com.reservation.teaecommerceplatform.mapper.RefundMapper">
+    
+    <resultMap id="BaseResultMap" type="com.reservation.teaecommerceplatform.entity.Refund">
+        <id column="id" property="id"/>
+        <result column="order_id" property="orderId"/>
+        <result column="user_id" property="userId"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="refund_no" property="refundNo"/>
+        <result column="refund_amount" property="refundAmount"/>
+        <result column="type" property="type"/>
+        <result column="reason" property="reason"/>
+        <result column="description" property="description"/>
+        <result column="images" property="images"/>
+        <result column="status" property="status"/>
+        <result column="reject_reason" property="rejectReason"/>
+        <result column="logistics_no" property="logisticsNo"/>
+        <result column="handler_id" property="handlerId"/>
+        <result column="handle_time" property="handleTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM `refund` WHERE id = #{id}
+    </select>
+
+    <select id="selectByRefundNo" resultMap="BaseResultMap">
+        SELECT * FROM `refund` WHERE refund_no = #{refundNo}
+    </select>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT * FROM `refund` WHERE user_id = #{userId} ORDER BY create_time DESC
+    </select>
+
+    <select id="selectByOrderId" resultMap="BaseResultMap">
+        SELECT * FROM `refund` WHERE order_id = #{orderId} ORDER BY create_time DESC
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM `refund`
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (order_no LIKE CONCAT('%', #{keyword}, '%') OR refund_no LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*) FROM `refund`
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (order_no LIKE CONCAT('%', #{keyword}, '%') OR refund_no LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectAllBySellerId" resultMap="BaseResultMap">
+        SELECT r.* FROM `refund` r
+        INNER JOIN order_item oi ON r.order_id = oi.order_id
+        <where>
+            oi.seller_id = #{sellerId}
+            <if test="keyword != null and keyword != ''">
+                AND (r.order_no LIKE CONCAT('%', #{keyword}, '%') OR r.refund_no LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="status != null">
+                AND r.status = #{status}
+            </if>
+        </where>
+        GROUP BY r.id
+        ORDER BY r.create_time DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countAllBySellerId" resultType="int">
+        SELECT COUNT(DISTINCT r.id) FROM `refund` r
+        INNER JOIN order_item oi ON r.order_id = oi.order_id
+        <where>
+            oi.seller_id = #{sellerId}
+            <if test="keyword != null and keyword != ''">
+                AND (r.order_no LIKE CONCAT('%', #{keyword}, '%') OR r.refund_no LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="status != null">
+                AND r.status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `refund` (order_id, user_id, order_no, refund_no, refund_amount, type, 
+                             reason, description, images, status, create_time, update_time)
+        VALUES (#{orderId}, #{userId}, #{orderNo}, #{refundNo}, #{refundAmount}, #{type},
+                #{reason}, #{description}, #{images}, #{status}, NOW(), NOW())
+    </insert>
+
+    <update id="update">
+        UPDATE `refund`
+        <set>
+            <if test="refundAmount != null">refund_amount = #{refundAmount},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="reason != null">reason = #{reason},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="images != null">images = #{images},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="rejectReason != null">reject_reason = #{rejectReason},</if>
+            <if test="logisticsNo != null">logistics_no = #{logisticsNo},</if>
+            <if test="handlerId != null">handler_id = #{handlerId},</if>
+            <if test="handleTime != null">handle_time = #{handleTime},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE `refund` SET status = #{status}, update_time = NOW() WHERE id = #{id}
+    </update>
+</mapper>
+

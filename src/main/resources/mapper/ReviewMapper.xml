@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 商品评价 review：联表用户昵称头像 -->
+<mapper namespace="com.reservation.teaecommerceplatform.mapper.ReviewMapper">
+    
+    <resultMap id="BaseResultMap" type="com.reservation.teaecommerceplatform.entity.Review">
+        <id column="id" property="id"/>
+        <result column="order_id" property="orderId"/>
+        <result column="order_item_id" property="orderItemId"/>
+        <result column="user_id" property="userId"/>
+        <result column="product_id" property="productId"/>
+        <result column="product_name" property="productName"/>
+        <result column="product_image" property="productImage"/>
+        <result column="rating" property="rating"/>
+        <result column="content" property="content"/>
+        <result column="images" property="images"/>
+        <result column="status" property="status"/>
+        <result column="reply" property="reply"/>
+        <result column="reply_time" property="replyTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="user_nickname" property="userNickname"/>
+        <result column="user_avatar" property="userAvatar"/>
+    </resultMap>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM `review` WHERE id = #{id}
+    </select>
+
+    <select id="selectByProductId" resultMap="BaseResultMap">
+        SELECT r.*, u.nickname as user_nickname, u.avatar as user_avatar
+        FROM `review` r
+        LEFT JOIN `user` u ON r.user_id = u.id
+        WHERE r.product_id = #{productId} AND r.status = 1
+        ORDER BY r.create_time DESC
+        <if test="limit != null and limit > 0">
+            LIMIT #{limit}
+        </if>
+        <if test="offset != null and offset >= 0">
+            OFFSET #{offset}
+        </if>
+    </select>
+
+    <select id="selectByOrderId" resultMap="BaseResultMap">
+        SELECT r.*, u.nickname as user_nickname, u.avatar as user_avatar
+        FROM `review` r
+        LEFT JOIN `user` u ON r.user_id = u.id
+        WHERE r.order_id = #{orderId} 
+        ORDER BY r.create_time DESC
+    </select>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT r.*, u.nickname as user_nickname, u.avatar as user_avatar
+        FROM `review` r
+        LEFT JOIN `user` u ON r.user_id = u.id
+        WHERE r.user_id = #{userId} 
+        ORDER BY r.create_time DESC
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM `review`
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (product_name LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countByProductId" resultType="int">
+        SELECT COUNT(*) FROM `review` WHERE product_id = #{productId} AND status = 1
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*) FROM `review`
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (product_name LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `review` (order_id, order_item_id, user_id, product_id, product_name, product_image, 
+                             rating, content, images, status, create_time, update_time)
+        VALUES (#{orderId}, #{orderItemId}, #{userId}, #{productId}, #{productName}, #{productImage},
+                #{rating}, #{content}, #{images}, #{status}, NOW(), NOW())
+    </insert>
+
+    <update id="update">
+        UPDATE `review`
+        <set>
+            <if test="rating != null">rating = #{rating},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="images != null">images = #{images},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="reply != null">reply = #{reply},</if>
+            <if test="replyTime != null">reply_time = #{replyTime},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE `review` SET status = #{status}, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM `review` WHERE id = #{id}
+    </delete>
+</mapper>
+
