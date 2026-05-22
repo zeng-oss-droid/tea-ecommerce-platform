@@ -168,7 +168,11 @@
       <div class="detail-tabs">
         <el-tabs v-model="activeTab">
           <el-tab-pane label="商品详情" name="detail">
-            <div class="detail-content" v-html="product.detail || product.description"></div>
+            <div
+              class="detail-content"
+              v-html="detailHtml"
+              @click="onDetailContentClick"
+            ></div>
           </el-tab-pane>
           <el-tab-pane label="商品参数" name="params">
             <div class="params-content">
@@ -281,6 +285,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
 import api from '../utils/api'
+import { linkTeaCultureKeywords } from '../utils/teaCultureKeywords'
 import { ElMessage } from 'element-plus'
 import { 
   Location, 
@@ -331,6 +336,19 @@ const imageList = computed(() => {
     return product.value.images.split(',')
   }
 })
+
+const detailHtml = computed(() => {
+  const raw = product.value?.detail || product.value?.description || ''
+  return linkTeaCultureKeywords(raw)
+})
+
+const onDetailContentClick = (event) => {
+  const link = event.target.closest('a.culture-link')
+  if (!link) return
+  event.preventDefault()
+  const href = link.getAttribute('href')
+  if (href) router.push(href)
+}
 
 const loadProduct = async () => {
   loading.value = true
@@ -812,6 +830,16 @@ const getRatingColor = (rating) => {
   line-height: 1.8;
   color: var(--text-primary);
   font-size: 15px;
+}
+
+.detail-content :deep(.culture-link) {
+  color: var(--primary-color);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.detail-content :deep(.culture-link:hover) {
+  opacity: 0.85;
 }
 
 .params-content {

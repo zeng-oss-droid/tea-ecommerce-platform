@@ -107,11 +107,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, watch, nextTick } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { isValidCultureSection } from '../utils/teaCultureKeywords'
 import { Reading } from '@element-plus/icons-vue'
 
 const router = useRouter()
+const route = useRoute()
 
 const cultureSections = ref([
   {
@@ -178,6 +180,24 @@ const seasonGuide = ref([
   { season: '秋', tea: '乌龙茶', desc: '润燥降火、调和脾胃' },
   { season: '冬', tea: '红茶', desc: '温中暖胃、抵御寒邪' }
 ])
+
+const scrollToSectionFromRoute = async () => {
+  const section = route.query.section
+  if (!section || typeof section !== 'string' || !isValidCultureSection(section)) return
+  await nextTick()
+  requestAnimationFrame(() => scrollTo(section))
+}
+
+onMounted(() => {
+  scrollToSectionFromRoute()
+})
+
+watch(
+  () => route.query.section,
+  () => {
+    scrollToSectionFromRoute()
+  }
+)
 
 const goToProducts = () => router.push('/products')
 const goHome = () => router.push('/')
