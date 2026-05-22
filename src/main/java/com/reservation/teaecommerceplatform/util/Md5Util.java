@@ -4,7 +4,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * 密码单向摘要（与明文比对用）；生产环境可替换为 BCrypt 等更强算法。
+ * 密码单向摘要
  */
 public class Md5Util {
     
