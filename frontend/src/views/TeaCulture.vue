@@ -1,3 +1,4 @@
+<!-- 茶文化专题：锚点导航，与商品详情关键词链接 section 参数对应 -->
 <template>
   <div class="tea-culture-page">
     <div class="banner">
@@ -107,6 +108,7 @@
 </template>
 
 <script setup>
+/** cultureSections[].key 与 teaCultureKeywords 的 section、URL ?section= 一致 */
 import { ref, onMounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { isValidCultureSection } from '../utils/teaCultureKeywords'

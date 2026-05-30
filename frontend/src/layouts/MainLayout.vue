@@ -1,19 +1,20 @@
+<!-- 前台主布局：顶栏导航 + 子路由内容区 -->
 <template>
-  <el-container>
-    <el-header>
+  <el-container class="main-layout">
+    <el-header class="site-header" height="60px">
       <div class="header-content">
-        <div class="logo" @click="$router.push('/')">
-          <img src="/logo/茶叶.png" alt="茗集" class="logo-image" />
-          <span>茗集</span>
+        <div class="logo" @click="router.push('/')">
+          <img src="/logo/茶叶.png" alt="茶韵" class="logo-image" />
+          <span>茶韵</span>
         </div>
-        <div class="header-nav">
-          <el-button text class="join-btn" @click="$router.push('/join-us')">加入我们</el-button>
-        </div>
-        <div class="user-info">
+        <div class="header-actions">
+          <router-link to="/join-us" class="header-link">加入我们</router-link>
           <template v-if="userStore.token">
-            <!-- 购物车图标 -->
-            <el-icon class="cart-icon" @click="$router.push('/cart')"><ShoppingCart /></el-icon>
-            <el-dropdown @command="handleCommand">
+            <router-link to="/cart" class="header-icon-btn" aria-label="购物车">
+              <el-icon><ShoppingCart /></el-icon>
+              <span v-if="cartStore.count > 0" class="cart-badge">{{ cartStore.count > 99 ? '99+' : cartStore.count }}</span>
+            </router-link>
+            <el-dropdown trigger="click" @command="handleCommand">
               <span class="user-name">
                 {{ userStore.userInfo?.nickname || userStore.userInfo?.username }}
                 <el-icon><ArrowDown /></el-icon>
@@ -31,31 +32,32 @@
             </el-dropdown>
           </template>
           <template v-else>
-            <el-button type="text" @click="$router.push('/login')">登录</el-button>
-            <el-button type="text" @click="$router.push('/register')">注册</el-button>
+            <router-link to="/login" class="header-link">登录</router-link>
+            <router-link to="/register" class="header-link">注册</router-link>
           </template>
         </div>
       </div>
     </el-header>
-    <el-main>
+    <el-main class="site-main">
       <router-view />
     </el-main>
   </el-container>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+/** 顶栏：登录态展示购物车角标与用户菜单；路由/ token 变化时刷新购物车 */
+import { onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
-import api from '../utils/api'
+import { useCartStore } from '../stores/cart'
 import { ArrowDown, ShoppingCart } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const cartStore = useCartStore()
 
-const cartCount = ref(0)
-
+/** 用户下拉：logout / admin / merchant / 前台个人页路由 */
 const handleCommand = (command) => {
   if (command === 'logout') {
     userStore.logout()
@@ -69,73 +71,74 @@ const handleCommand = (command) => {
   }
 }
 
-const loadCartCount = async () => {
-  if (!userStore.token) {
-    cartCount.value = 0
-    return
-  }
-  try {
-    const res = await api.get('/cart/list')
-    cartCount.value = res.data?.length || 0
-  } catch (error) {
-    cartCount.value = 0
-  }
-}
-
+// 有 token 时恢复用户信息；无论是否登录都尝试同步购物车角标
 onMounted(async () => {
   if (userStore.token) {
     try {
       await userStore.getUserInfo()
-      loadCartCount()
     } catch (error) {
-      // 如果获取用户信息失败，清除token
       if (error.response?.status === 401) {
         userStore.logout()
       }
     }
   }
-  loadCartCount()
+  cartStore.refresh()
 })
 
-// 监听路由变化，更新购物车数量
+// 路由切换且已登录时刷新购物车数量
 watch(() => route.path, () => {
   if (userStore.token) {
-    loadCartCount()
+    cartStore.refresh()
   }
 })
 
-// 监听用户登录状态变化
+// 登录/登出时刷新或清空购物车角标
 watch(() => userStore.token, (newToken) => {
   if (newToken) {
-    loadCartCount()
+    cartStore.refresh()
   } else {
-    cartCount.value = 0
+    cartStore.reset()
   }
 })
 </script>
 
 <style scoped>
-.el-header {
+.main-layout {
+  min-height: 100vh;
+}
+
+.site-header {
   background: linear-gradient(135deg, #bc3823 0%, #9d2d1c 100%);
   border-bottom: none;
   padding: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 3000;
+  isolation: isolate;
+}
+
+.site-main {
+  position: relative;
+  z-index: 0;
+  min-height: calc(100vh - 60px);
+  background: linear-gradient(to bottom, #fef5f3 0%, #ffffff 100%);
+  padding: 0;
 }
 
 .header-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 100%;
+  height: 60px;
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+  gap: 16px;
 }
 
 .logo {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -156,73 +159,89 @@ watch(() => userStore.token, (newToken) => {
   object-fit: contain;
 }
 
-.user-info {
+.header-actions {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 4px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 
-.header-nav {
-  margin-left: auto;
-  margin-right: 20px;
-}
-
-.join-btn {
+.header-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 12px;
   color: #fff;
   font-size: 14px;
   font-weight: 500;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.header-link:hover {
+  opacity: 0.9;
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.header-icon-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: #fff;
+  font-size: 20px;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.header-icon-btn:hover {
+  opacity: 0.9;
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.cart-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 16px;
+  height: 16px;
   padding: 0 4px;
-  height: 32px;
-  border: none;
-  background: transparent;
-  border-radius: 0;
-  transition: opacity 0.2s ease;
-}
-
-.join-btn:hover {
-  color: #fff;
-  opacity: 0.78;
-}
-
-:deep(.join-btn.el-button.is-text:not(.is-disabled):hover),
-:deep(.join-btn.el-button.is-text:not(.is-disabled):focus),
-:deep(.join-btn.el-button.is-text:not(.is-disabled):active) {
-  background-color: transparent !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-}
-
-.cart-icon {
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
-  color: #fff;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-.cart-icon:hover {
-  opacity: 0.78;
+  font-size: 11px;
+  line-height: 16px;
+  text-align: center;
+  color: #bc3823;
+  background: #fff;
+  border-radius: 8px;
+  pointer-events: none;
 }
 
 .user-name {
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 4px;
+  min-height: 40px;
+  padding: 0 12px;
   color: #fff;
-  padding: 0 4px;
-  border: none;
-  background: transparent;
-  border-radius: 0;
+  border-radius: 6px;
   font-size: 14px;
   font-weight: 500;
   line-height: 1;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+  outline: none;
 }
 
 .user-name:hover {
-  opacity: 0.78;
+  opacity: 0.9;
+  background-color: rgba(255, 255, 255, 0.12);
 }
 
 .user-name:focus,
@@ -230,29 +249,11 @@ watch(() => userStore.token, (newToken) => {
   outline: none;
 }
 
-:deep(.el-dropdown),
-:deep(.el-dropdown:focus),
-:deep(.el-dropdown:focus-visible),
-:deep(.el-tooltip__trigger:focus),
-:deep(.el-tooltip__trigger:focus-visible) {
+.header-actions :deep(.el-dropdown) {
   outline: none;
 }
 
-:deep(.el-button--text) {
-  color: #fff;
-}
-
-:deep(.el-button--text:hover) {
-  color: #fff;
-  background: transparent;
-  opacity: 0.78;
-}
-
-
-.el-main {
-  min-height: calc(100vh - 60px);
-  background: linear-gradient(to bottom, #fef5f3 0%, #ffffff 100%);
-  padding: 0;
+.header-actions :deep(.el-tooltip__trigger) {
+  outline: none;
 }
 </style>
-

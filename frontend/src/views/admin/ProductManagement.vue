@@ -1,3 +1,4 @@
+<!-- 商品管理：管理员维护全站商品，商家仅维护自己的商品 -->
 <template>
   <div class="product-management">
     <div class="header header--toolbar">
@@ -149,6 +150,7 @@
 </template>
 
 <script setup>
+/** 根据路由 /admin 或 /merchant 切换 API 范围与表单字段 */
 import { ref, reactive, onMounted, computed } from 'vue'
 import api from '../../utils/api'
 import { ElMessage, ElMessageBox } from 'element-plus'

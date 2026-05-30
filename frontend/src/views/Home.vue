@@ -1,3 +1,4 @@
+<!-- 首页：轮播、茶文化摘要、热门分类、热销商品 -->
 <template>
   <div class="home">
     <!-- 轮播图 -->
@@ -138,15 +139,17 @@
 </template>
 
 <script setup>
+/** 静态轮播/文化区块 + 接口拉取热门商品与顶级分类 */
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '../stores/user'
+import { useCartStore } from '../stores/cart'
 import api from '../utils/api'
+import { toast } from '../utils/message'
 import { ElMessage } from 'element-plus'
 import { Star, ShoppingCart, TrendCharts, Grid, Reading } from '@element-plus/icons-vue'
 
 const router = useRouter()
-const userStore = useUserStore()
+const cartStore = useCartStore()
 
 const banners = ref([
   { 
@@ -203,16 +206,16 @@ const goToDetail = (id) => {
 }
 
 const addToCart = async (productId) => {
-  if (!userStore.token) {
-    ElMessage.warning('请先登录')
-    router.push('/login')
-    return
-  }
   try {
-    await api.post('/cart/add', { productId, quantity: 1 })
-    ElMessage.success('已加入购物车')
+    await cartStore.addItem(productId, 1)
+    toast.success('已加入购物车')
   } catch (error) {
-    ElMessage.error('加入购物车失败')
+    if (error.code === 'LOGIN_REQUIRED') {
+      toast.warning('请先登录')
+      router.push('/login')
+      return
+    }
+    toast.error(error.message || '加入购物车失败')
   }
 }
 
@@ -228,6 +231,7 @@ const goToTeaCulture = () => {
   router.push('/tea-culture')
 }
 
+/** 取启用状态的顶级分类最多 5 个展示在首页 */
 const loadHotCategories = async () => {
   try {
     const res = await api.get('/category/list')
@@ -261,6 +265,8 @@ onMounted(async () => {
 .banner-section {
   width: 100%;
   margin-bottom: 20px;
+  position: relative;
+  z-index: 0;
 }
 
 .banner-item {

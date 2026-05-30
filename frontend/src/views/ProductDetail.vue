@@ -1,3 +1,4 @@
+<!-- 商品详情：图册、规格、加购/立即购买、详情富文本（茶文化关键词链）与评价 -->
 <template>
   <div class="product-detail-page">
     <div class="breadcrumb-wrapper">
@@ -281,11 +282,14 @@
 </template>
 
 <script setup>
+/** 路由 params.id → /product/detail；buyNow 走订单创建流程 */
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
+import { useCartStore } from '../stores/cart'
 import api from '../utils/api'
 import { linkTeaCultureKeywords } from '../utils/teaCultureKeywords'
+import { toast } from '../utils/message'
 import { ElMessage } from 'element-plus'
 import { 
   Location, 
@@ -304,6 +308,7 @@ import {
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const cartStore = useCartStore()
 
 const product = ref(null)
 const quantity = ref(1)
@@ -337,6 +342,7 @@ const imageList = computed(() => {
   }
 })
 
+/** 详情 HTML 中将茶文化关键词替换为 /tea-culture?section= 链接 */
 const detailHtml = computed(() => {
   const raw = product.value?.detail || product.value?.description || ''
   return linkTeaCultureKeywords(raw)
@@ -374,31 +380,30 @@ const loadProduct = async () => {
 }
 
 const addToCart = async () => {
-  if (!userStore.token) {
-    ElMessage.warning('请先登录')
-    router.push('/login')
-    return
-  }
   try {
-    await api.post('/cart/add', { productId: product.value.id, quantity: quantity.value })
-    ElMessage.success('已加入购物车')
+    await cartStore.addItem(product.value.id, quantity.value)
+    toast.success('已加入购物车')
   } catch (error) {
-    ElMessage.error('加入购物车失败')
+    if (error.code === 'LOGIN_REQUIRED') {
+      toast.warning('请先登录')
+      router.push('/login')
+      return
+    }
+    toast.error(error.message || '加入购物车失败')
   }
 }
 
 const buyNow = async () => {
-  if (!userStore.token) {
-    ElMessage.warning('请先登录')
-    router.push('/login')
-    return
-  }
-  // 先加入购物车，然后跳转到订单页面
   try {
-    await api.post('/cart/add', { productId: product.value.id, quantity: quantity.value })
+    await cartStore.addItem(product.value.id, quantity.value)
     router.push('/cart')
   } catch (error) {
-    ElMessage.error('操作失败')
+    if (error.code === 'LOGIN_REQUIRED') {
+      toast.warning('请先登录')
+      router.push('/login')
+      return
+    }
+    toast.error(error.message || '操作失败')
   }
 }
 

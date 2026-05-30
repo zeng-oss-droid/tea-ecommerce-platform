@@ -1,3 +1,4 @@
+<!-- 商品列表页：左侧分类筛选 + 搜索排序 + 分页网格 -->
 <template>
   <div class="products-page">
     <div class="page-header">
@@ -127,16 +128,18 @@
 </template>
 
 <script setup>
+/** 对接 /product/list、/category/list；支持 URL query.categoryId 初始分类 */
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useUserStore } from '../stores/user'
+import { useCartStore } from '../stores/cart'
+import { toast } from '../utils/message'
 import api from '../utils/api'
 import { ElMessage } from 'element-plus'
 import { Menu, Goods, Search, ArrowUp, ArrowDown, ShoppingCart, TrendCharts } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const route = useRoute()
-const userStore = useUserStore()
+const cartStore = useCartStore()
 
 const categories = ref([])
 const activeCategory = ref(route.query.categoryId ? String(route.query.categoryId) : '0')
@@ -152,6 +155,7 @@ const query = reactive({
   sortOrder: 'asc'
 })
 
+/** 解析 images 字段（JSON 数组或逗号分隔），取首图 */
 const getProductImage = (images) => {
   if (!images) return 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=300&h=300&fit=crop'
   try {
@@ -170,6 +174,7 @@ const handleCategorySelect = (categoryId) => {
   loadProducts()
 }
 
+/** 拉取分页商品；price-desc 转为 sortBy=price & sortOrder=desc */
 const loadProducts = async () => {
   try {
     const params = { ...query }
@@ -200,16 +205,16 @@ const goToDetail = (id) => {
 }
 
 const addToCart = async (productId) => {
-  if (!userStore.token) {
-    ElMessage.warning('请先登录')
-    router.push('/login')
-    return
-  }
   try {
-    await api.post('/cart/add', { productId, quantity: 1 })
-    ElMessage.success('已加入购物车')
+    await cartStore.addItem(productId, 1)
+    toast.success('已加入购物车')
   } catch (error) {
-    ElMessage.error('加入购物车失败')
+    if (error.code === 'LOGIN_REQUIRED') {
+      toast.warning('请先登录')
+      router.push('/login')
+      return
+    }
+    toast.error(error.message || '加入购物车失败')
   }
 }
 

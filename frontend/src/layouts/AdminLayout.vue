@@ -1,3 +1,4 @@
+<!-- 管理/商家后台布局：侧栏菜单 + 顶栏标题（来自 route.meta） -->
 <template>
   <el-container class="admin-app-shell" :class="{ 'admin-app-shell--merchant': isMerchantOnly }">
     <el-aside :width="asideWidth" class="admin-sidenav">
@@ -103,6 +104,7 @@
 </template>
 
 <script setup>
+/** /merchant 与 /admin 共用本布局，isMerchantOnly 控制菜单项与主题色 */
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'

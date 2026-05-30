@@ -1,3 +1,4 @@
+<!-- 个人中心：资料编辑与修改密码 -->
 <template>
   <div class="profile-page">
     <div class="container">
@@ -54,6 +55,7 @@
 </template>
 
 <script setup>
+/** 同步 userStore.userInfo；密码修改走独立接口 */
 import { ref, reactive, onMounted } from 'vue'
 import { useUserStore } from '../stores/user'
 import api from '../utils/api'

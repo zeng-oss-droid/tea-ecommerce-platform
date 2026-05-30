@@ -1,3 +1,4 @@
+<!-- 订单管理：搜索、发货、状态更新（管理员/商家共用） -->
 <template>
   <div class="order-management">
     <el-card>
@@ -80,6 +81,7 @@
 </template>
 
 <script setup>
+/** 列表按订单号/状态筛选；商家端仅见本店订单 */
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../../stores/user'

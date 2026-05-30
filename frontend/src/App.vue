@@ -1,8 +1,10 @@
+<!-- 根组件：仅承载路由出口，全局基础样式在此定义 -->
 <template>
   <router-view />
 </template>
 
 <script setup>
+// 无业务逻辑，布局与页面由各 layout / view 负责
 </script>
 
 <style>

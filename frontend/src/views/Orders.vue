@@ -1,3 +1,4 @@
+<!-- 订单列表：按状态筛选，支持支付/取消/确认收货等快捷操作 -->
 <template>
   <div class="orders-page">
     <div class="page-header">
@@ -130,6 +131,7 @@
 </template>
 
 <script setup>
+/** 订单状态：0待支付 1待发货 2待收货 3已完成 5退款中 */
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../utils/api'

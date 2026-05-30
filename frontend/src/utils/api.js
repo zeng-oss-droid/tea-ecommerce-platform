@@ -1,3 +1,7 @@
+/**
+ * Axios 封装：统一 baseURL、JWT 注入与响应/错误处理
+ * 业务错误（code !== 200）由调用方自行提示，避免重复弹窗
+ */
 import axios from 'axios'
 import { useUserStore } from '../stores/user'
 import { ElMessage } from 'element-plus'

@@ -1,3 +1,4 @@
+<!-- 管理端数据统计：用户数、商品、订单、销售额及图表 -->
 <template>
   <div class="dashboard">
     <el-row :gutter="20" class="stat-row">
@@ -83,6 +84,7 @@
 </template>
 
 <script setup>
+/** ECharts 展示趋势；仅管理员路由可见 */
 import { ref, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import api from '../../utils/api'
 import { User, Goods, ShoppingBag, Money } from '@element-plus/icons-vue'

@@ -1,3 +1,7 @@
+/**
+ * 全局设计令牌与 Element Plus 主题覆盖
+ * 主色 #bc3823，复色 #fbcc8d；各页面通过 var(--*) 引用
+ */
 :root {
   /* 主色调 RGB(188, 56, 35) = #bc3823 */
   --primary-color: #bc3823;
@@ -78,5 +82,11 @@ body {
 
 .el-tabs__item:hover {
   color: var(--primary-color);
+}
+
+/* 保证全局提示在顶栏（z-index: 3000）之上可见 */
+.el-message,
+.el-notification {
+  z-index: 10000 !important;
 }
 

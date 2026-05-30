@@ -55,6 +55,7 @@ export const TEA_CULTURE_KEYWORDS = [
 
 const SECTION_KEYS = new Set(TEA_CULTURE_KEYWORDS.map((item) => item.section))
 
+/** 校验 URL section 是否为已配置的文化区块 key */
 export function isValidCultureSection(section) {
   return SECTION_KEYS.has(section)
 }

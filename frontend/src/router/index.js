@@ -1,8 +1,15 @@
+/**
+ * 路由配置与全局守卫
+ * - 前台：MainLayout 嵌套首页、商品、购物车等
+ * - 后台：/admin 需 role=1；/merchant 需 role=1 或 2
+ * - meta.requiresAuth：未登录跳转 /login
+ */
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '../stores/user'
 import { ElMessage } from 'element-plus'
 
 const routes = [
+  // ---------- 前台（MainLayout） ----------
   {
     path: '/',
     component: () => import('../layouts/MainLayout.vue'),
@@ -64,6 +71,7 @@ const routes = [
       }
     ]
   },
+  // ---------- 认证（无布局） ----------
   {
     path: '/login',
     name: 'Login',
@@ -74,6 +82,7 @@ const routes = [
     name: 'Register',
     component: () => import('../views/Register.vue')
   },
+  // ---------- 管理后台 role=1 ----------
   {
     path: '/admin',
     component: () => import('../layouts/AdminLayout.vue'),
@@ -123,6 +132,7 @@ const routes = [
       }
     ]
   },
+  // ---------- 商家后台 role=1 或 2 ----------
   {
     path: '/merchant',
     component: () => import('../layouts/AdminLayout.vue'),

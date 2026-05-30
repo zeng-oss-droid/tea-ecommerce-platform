@@ -1,3 +1,4 @@
+<!-- 退款审核与处理（管理员全站 / 商家本店） -->
 <template>
   <div class="refund-management">
     <el-card>
@@ -152,6 +153,7 @@
 </template>
 
 <script setup>
+/** 退款状态流转：申请、审核、退货物流等 */
 import { ref, onMounted } from 'vue'
 import api from '../../utils/api'
 import { ElMessage, ElMessageBox } from 'element-plus'

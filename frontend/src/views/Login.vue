@@ -1,3 +1,4 @@
+<!-- 登录页：校验通过后写入 userStore 并跳转首页 -->
 <template>
   <div class="auth-page login-page">
     <div class="auth-layout">
@@ -40,6 +41,7 @@
 </template>
 
 <script setup>
+/** 调用 userStore.login，成功后跳转首页 */
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'

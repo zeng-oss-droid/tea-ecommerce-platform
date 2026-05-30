@@ -1,3 +1,4 @@
+<!-- 购物车：勾选结算、改数量、批量删除；需登录 -->
 <template>
   <div class="cart-page">
     <div class="cart-container">
@@ -74,12 +75,15 @@
 </template>
 
 <script setup>
+/** 列表项附带 product 详情（并发请求）；结算跳转地址页并带 cartIds */
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../utils/api'
+import { useCartStore } from '../stores/cart'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 const router = useRouter()
+const cartStore = useCartStore()
 
 const cartList = ref([])
 const selectedItems = ref([])
@@ -126,6 +130,7 @@ const loadCart = async () => {
     )
     cartList.value = detailList
     selectedItems.value = []
+    cartStore.updateCount(detailList.length)
   } catch (error) {
     console.error('获取购物车失败', error)
   } finally {
@@ -196,6 +201,7 @@ const removeSelected = async () => {
   }
 }
 
+/** 携带选中 cartId 跳转地址页 checkout=1 */
 const checkout = () => {
   if (selectedItems.value.length === 0) {
     ElMessage.warning('请先选择要结算的商品')

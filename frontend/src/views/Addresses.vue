@@ -1,3 +1,4 @@
+<!-- 收货地址 CRUD；checkout=1 时展示购物车汇总并提交订单 -->
 <template>
   <div class="addresses-page">
     <div class="container">
@@ -145,6 +146,7 @@
 </template>
 
 <script setup>
+/** route.query.checkout / cartIds 区分「地址管理」与「结算下单」模式 */
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../utils/api'

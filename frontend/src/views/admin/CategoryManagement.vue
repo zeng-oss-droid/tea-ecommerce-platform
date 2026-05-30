@@ -1,3 +1,4 @@
+<!-- 商品分类树：增删改与排序（仅管理员） -->
 <template>
   <div class="category-management">
     <div class="header header--toolbar">
@@ -104,6 +105,7 @@
 </template>
 
 <script setup>
+/** 树形分类 parentId=0 为顶级；支持启用/禁用状态 */
 import { ref, reactive, onMounted, computed } from 'vue'
 import api from '../../utils/api'
 import { ElMessage, ElMessageBox } from 'element-plus'

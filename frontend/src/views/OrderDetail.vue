@@ -1,3 +1,4 @@
+<!-- 订单详情：状态流转、退款/评价/物流等完整操作 -->
 <template>
   <div class="order-detail-page">
     <div class="breadcrumb-wrapper">
@@ -311,6 +312,7 @@
 </template>
 
 <script setup>
+/** 单订单完整生命周期：支付、取消、收货、退款申请与评价 */
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../utils/api'

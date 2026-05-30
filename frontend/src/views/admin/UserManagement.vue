@@ -1,3 +1,4 @@
+<!-- 用户管理：角色与账号状态（仅管理员） -->
 <template>
   <div class="user-management">
     <div class="header header--toolbar">
@@ -79,6 +80,7 @@
 </template>
 
 <script setup>
+/** role：0 用户 1 管理员 2 商家；可禁用账号 */
 import { ref, onMounted } from 'vue'
 import api from '../../utils/api'
 import { ElMessage, ElMessageBox } from 'element-plus'

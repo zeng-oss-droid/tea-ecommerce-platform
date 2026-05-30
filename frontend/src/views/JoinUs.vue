@@ -1,3 +1,4 @@
+<!-- 商家入驻申请（需登录） -->
 <template>
   <div class="join-us-page">
     <div class="join-layout">
@@ -48,6 +49,7 @@
 </template>
 
 <script setup>
+/** POST 商家申请接口；未登录引导至登录页 */
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'

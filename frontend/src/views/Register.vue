@@ -1,3 +1,4 @@
+<!-- 注册页：提交后跳转登录 -->
 <template>
   <div class="auth-page register-page">
     <div class="auth-layout">
@@ -54,6 +55,7 @@
 </template>
 
 <script setup>
+/** 自定义校验 confirmPassword；注册成功跳转 /login */
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'

@@ -1,3 +1,4 @@
+<!-- 商家入驻申请审核（仅管理员） -->
 <template>
   <div class="merchant-application-management">
     <div class="header header--toolbar">
@@ -100,6 +101,7 @@
 </template>
 
 <script setup>
+/** 审核通过后将用户 role 设为商家 */
 import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import api from '../../utils/api'

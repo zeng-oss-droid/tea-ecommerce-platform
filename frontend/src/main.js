@@ -1,3 +1,6 @@
+/**
+ * 应用入口：创建 Vue 实例，注册 Pinia、路由、Element Plus 及全局图标
+ */
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import ElementPlus from 'element-plus'
