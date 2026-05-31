@@ -25,6 +25,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Autowired
     private OrderItemMapper orderItemMapper;
 
+    /** 仪表盘概览统计 */
     @Override
     public Map<String, Object> getDashboardStats() {
         Map<String, Object> stats = new HashMap<>();
@@ -52,6 +53,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         return stats;
     }
 
+    /** 订单维度统计 */
     @Override
     public Map<String, Object> getOrderStats(String startDate, String endDate) {
         Map<String, Object> stats = new HashMap<>();
@@ -67,6 +69,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         return stats;
     }
 
+    /** 商品维度统计 */
     @Override
     public Map<String, Object> getProductStats() {
         Map<String, Object> stats = new HashMap<>();
@@ -80,6 +83,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         return stats;
     }
 
+    /** 用户维度统计 */
     @Override
     public Map<String, Object> getUserStats() {
         Map<String, Object> stats = new HashMap<>();

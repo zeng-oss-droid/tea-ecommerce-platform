@@ -38,6 +38,7 @@ public class AdminController {
     private com.reservation.teaecommerceplatform.service.ReviewService reviewService;
 
     // ---------- 用户管理（含详情、启停、角色、删除账号）----------
+    /** 分页查询用户列表，支持 keyword 模糊搜索 */
     @GetMapping("/users")
     public Result<Map<String, Object>> getUserList(
             @RequestParam(defaultValue = "1") Integer pageNum,
@@ -51,6 +52,7 @@ public class AdminController {
         }
     }
 
+    /** 根据用户 ID 查询用户详情（不返回密码） */
     @GetMapping("/users/{id}")
     public Result<User> getUserById(@PathVariable Long id) {
         try {
@@ -62,6 +64,7 @@ public class AdminController {
         }
     }
 
+    /** 启用/禁用用户，请求体：{@code { "status": 0 }}（0禁用 1启用） */
     @PutMapping("/users/{id}/status")
     public Result<Void> updateUserStatus(@PathVariable Long id, @RequestBody Map<String, Integer> params) {
         try {
@@ -73,6 +76,7 @@ public class AdminController {
         }
     }
 
+    /** 修改用户角色，请求体：{@code { "role": 2 }}（1管理员 2商家 3普通用户） */
     @PutMapping("/users/{id}/role")
     public Result<Void> updateUserRole(@PathVariable Long id, @RequestBody Map<String, Integer> params) {
         try {
@@ -145,6 +149,7 @@ public class AdminController {
     }
 
     // ---------- 数据统计（仪表盘、订单/商品/用户维度）----------
+    /** 获取仪表盘概览统计数据（订单量、销售额、用户数等） */
     @GetMapping("/statistics/dashboard")
     public Result<Map<String, Object>> getDashboardStats() {
         try {
@@ -155,6 +160,7 @@ public class AdminController {
         }
     }
 
+    /** 获取订单统计数据，可按 startDate、endDate 筛选日期范围 */
     @GetMapping("/statistics/orders")
     public Result<Map<String, Object>> getOrderStats(
             @RequestParam(required = false) String startDate,
@@ -167,6 +173,7 @@ public class AdminController {
         }
     }
 
+    /** 获取商品维度统计数据（销量、库存等） */
     @GetMapping("/statistics/products")
     public Result<Map<String, Object>> getProductStats() {
         try {
@@ -177,6 +184,7 @@ public class AdminController {
         }
     }
 
+    /** 获取用户维度统计数据（注册量、活跃度等） */
     @GetMapping("/statistics/users")
     public Result<Map<String, Object>> getUserStats() {
         try {
@@ -188,6 +196,7 @@ public class AdminController {
     }
 
     // ---------- 订单管理 ----------
+    /** 分页查询全站订单，支持 keyword 搜索和 status 状态筛选 */
     @GetMapping("/orders")
     public Result<Map<String, Object>> getAllOrders(
             @RequestParam(defaultValue = "1") Integer pageNum,
@@ -202,6 +211,7 @@ public class AdminController {
         }
     }
 
+    /** 管理员修改订单状态，请求体：{@code { "status": 2 }} */
     @PutMapping("/orders/{id}/status")
     public Result<Void> updateOrderStatus(@PathVariable Long id, @RequestBody Map<String, Integer> params) {
         try {
@@ -214,6 +224,7 @@ public class AdminController {
     }
 
     // ---------- 退款管理 ----------
+    /** 分页查询全站退款申请，支持 keyword 搜索和 status 状态筛选 */
     @GetMapping("/refunds")
     public Result<Map<String, Object>> getAllRefunds(
             @RequestParam(defaultValue = "1") Integer pageNum,
@@ -228,6 +239,7 @@ public class AdminController {
         }
     }
     
+    /** 管理员审核通过退款申请 */
     @PostMapping("/refunds/{id}/approve")
     public Result<Void> approveRefund(@PathVariable Long id, HttpServletRequest request) {
         try {
@@ -239,6 +251,7 @@ public class AdminController {
         }
     }
     
+    /** 管理员驳回退款申请，请求体：{@code { "rejectReason": "..." }} */
     @PostMapping("/refunds/{id}/reject")
     public Result<Void> rejectRefund(@PathVariable Long id, @RequestBody Map<String, String> params, HttpServletRequest request) {
         try {
@@ -251,6 +264,7 @@ public class AdminController {
         }
     }
     
+    /** 管理员标记退款处理完成（等待买家退货） */
     @PostMapping("/refunds/{id}/complete")
     public Result<Void> completeRefund(@PathVariable Long id, HttpServletRequest request) {
         try {
@@ -262,6 +276,7 @@ public class AdminController {
         }
     }
     
+    /** 管理员确认收到退货，退款流程结束 */
     @PostMapping("/refunds/{id}/confirm-receive")
     public Result<Void> confirmReceive(@PathVariable Long id, HttpServletRequest request) {
         try {
@@ -274,6 +289,7 @@ public class AdminController {
     }
 
     // ---------- 评论管理 ----------
+    /** 分页查询全站评论，支持 keyword 搜索和 status 审核状态筛选 */
     @GetMapping("/reviews")
     public Result<Map<String, Object>> getAllReviews(
             @RequestParam(defaultValue = "1") Integer pageNum,
@@ -288,6 +304,7 @@ public class AdminController {
         }
     }
     
+    /** 修改评论审核状态，请求体：{@code { "status": 1 }}（1通过 2隐藏） */
     @PutMapping("/reviews/{id}/status")
     public Result<Void> updateReviewStatus(@PathVariable Long id, @RequestBody Map<String, Integer> params) {
         try {
@@ -299,6 +316,7 @@ public class AdminController {
         }
     }
     
+    /** 管理员回复评论，请求体：{@code { "reply": "..." }} */
     @PostMapping("/reviews/{id}/reply")
     public Result<Void> replyReview(@PathVariable Long id, @RequestBody Map<String, String> params) {
         try {
@@ -310,6 +328,7 @@ public class AdminController {
         }
     }
     
+    /** 管理员删除评论 */
     @DeleteMapping("/reviews/{id}")
     public Result<Void> deleteReview(@PathVariable Long id) {
         try {

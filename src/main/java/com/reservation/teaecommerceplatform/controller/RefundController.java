@@ -18,6 +18,7 @@ public class RefundController {
     @Autowired
     private RefundService refundService;
     
+    /** 买家提交退款申请，请求体含 orderId、type、reason、description、images */
     @PostMapping("/create")
     public Result<Refund> createRefund(@RequestBody Map<String, Object> params, HttpServletRequest request) {
         try {
@@ -39,6 +40,7 @@ public class RefundController {
         }
     }
     
+    /** 获取当前登录用户的退款申请列表 */
     @GetMapping("/my")
     public Result<List<Refund>> getMyRefunds(HttpServletRequest request) {
         try {
@@ -53,6 +55,7 @@ public class RefundController {
         }
     }
     
+    /** 根据退款 ID 查询退款详情 */
     @GetMapping("/detail/{refundId}")
     public Result<Refund> getRefundDetail(@PathVariable Long refundId) {
         try {
@@ -63,6 +66,7 @@ public class RefundController {
         }
     }
     
+    /** 买家取消待审核的退款申请 */
     @PostMapping("/cancel/{refundId}")
     public Result<Void> cancelRefund(@PathVariable Long refundId, HttpServletRequest request) {
         try {
@@ -77,6 +81,7 @@ public class RefundController {
         }
     }
     
+    /** 买家填写退货快递单号，请求体：{@code { "logisticsNo": "SF1234567890" }} */
     @PostMapping("/update-logistics/{refundId}")
     public Result<Void> updateLogisticsNo(@PathVariable Long refundId, @RequestBody Map<String, String> params, HttpServletRequest request) {
         try {

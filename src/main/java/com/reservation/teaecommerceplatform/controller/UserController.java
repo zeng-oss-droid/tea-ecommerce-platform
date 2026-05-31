@@ -24,6 +24,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    /** 用户注册，请求体为 UserRegisterDTO（用户名、密码等） */
     @PostMapping("/register")
     public Result<Map<String, Object>> register(@Valid @RequestBody UserRegisterDTO registerDTO) {
         try {
@@ -37,6 +38,7 @@ public class UserController {
         }
     }
 
+    /** 用户登录，返回 JWT Token */
     @PostMapping("/login")
     public Result<Map<String, Object>> login(@Valid @RequestBody UserLoginDTO loginDTO) {
         try {
@@ -49,6 +51,7 @@ public class UserController {
         }
     }
 
+    /** 获取当前登录用户信息（需携带 JWT Token） */
     @GetMapping("/info")
     public Result<User> getCurrentUser(HttpServletRequest request) {
         try {
@@ -65,6 +68,7 @@ public class UserController {
         }
     }
 
+    /** 更新当前登录用户的基本信息（昵称、头像等） */
     @PutMapping("/info")
     public Result<User> updateUser(@RequestBody User user, HttpServletRequest request) {
         try {
@@ -77,6 +81,7 @@ public class UserController {
         }
     }
 
+    /** 修改密码，请求体：{@code { "oldPassword": "...", "newPassword": "..." }} */
     @PutMapping("/password")
     public Result<Void> updatePassword(@RequestBody Map<String, String> params, HttpServletRequest request) {
         try {

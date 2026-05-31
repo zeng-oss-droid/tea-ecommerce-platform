@@ -18,11 +18,13 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductMapper productMapper;
 
+    /** 根据ID查询商品 */
     @Override
     public Product getById(Long id) {
         return productMapper.selectById(id);
     }
 
+    /** 分页查询商品列表 */
     @Override
     public Map<String, Object> getList(ProductQueryDTO queryDTO) {
         List<Product> list = productMapper.selectList(queryDTO);

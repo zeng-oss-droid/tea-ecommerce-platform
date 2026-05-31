@@ -31,6 +31,7 @@ public class RefundServiceImpl implements RefundService {
     @Autowired
     private OrderItemMapper orderItemMapper;
     
+    /** 买家提交退款申请 */
     @Override
     @Transactional
     public Refund createRefund(Long userId, Long orderId, Integer type, String reason, String description, String images) {
@@ -74,16 +75,19 @@ public class RefundServiceImpl implements RefundService {
         return refund;
     }
     
+    /** 查询我的退款列表 */
     @Override
     public List<Refund> getMyRefunds(Long userId) {
         return refundMapper.selectByUserId(userId);
     }
     
+    /** 查询退款详情 */
     @Override
     public Refund getRefundDetail(Long refundId) {
         return refundMapper.selectById(refundId);
     }
     
+    /** 管理端分页查询全站退款 */
     @Override
     public Map<String, Object> getAllRefunds(Integer pageNum, Integer pageSize, String keyword, Integer status) {
         int offset = (pageNum - 1) * pageSize;
@@ -99,6 +103,7 @@ public class RefundServiceImpl implements RefundService {
         return result;
     }
     
+    /** 管理员同意退款 */
     @Override
     @Transactional
     public void approveRefund(Long refundId, Long handlerId) {
@@ -124,6 +129,7 @@ public class RefundServiceImpl implements RefundService {
         // 如果是退货退款，状态保持为已同意，等待买家填写快递单号
     }
     
+    /** 管理员驳回退款 */
     @Override
     @Transactional
     public void rejectRefund(Long refundId, Long handlerId, String rejectReason) {
@@ -156,6 +162,7 @@ public class RefundServiceImpl implements RefundService {
         }
     }
     
+    /** 管理员完成退款 */
     @Override
     @Transactional
     public void completeRefund(Long refundId, Long handlerId) {
@@ -177,6 +184,7 @@ public class RefundServiceImpl implements RefundService {
         orderMapper.updateStatus(refund.getOrderId(), 6);
     }
     
+    /** 买家填写退货快递单号 */
     @Override
     @Transactional
     public void updateLogisticsNo(Long refundId, String logisticsNo) {
@@ -198,6 +206,7 @@ public class RefundServiceImpl implements RefundService {
         refundMapper.update(refund);
     }
     
+    /** 管理员确认收到退货 */
     @Override
     @Transactional
     public void confirmReceive(Long refundId, Long handlerId) {
@@ -224,6 +233,7 @@ public class RefundServiceImpl implements RefundService {
         orderMapper.updateStatus(refund.getOrderId(), 6);
     }
     
+    /** 买家取消退款申请 */
     @Override
     @Transactional
     public void cancelRefund(Long refundId) {
@@ -252,6 +262,7 @@ public class RefundServiceImpl implements RefundService {
         }
     }
 
+    /** 商家分页查询本店退款 */
     @Override
     public Map<String, Object> getMerchantRefunds(Long sellerId, Integer pageNum, Integer pageSize, String keyword, Integer status) {
         int offset = (pageNum - 1) * pageSize;
@@ -267,30 +278,35 @@ public class RefundServiceImpl implements RefundService {
         return result;
     }
 
+    /** 商家同意退款 */
     @Override
     public void approveMerchantRefund(Long refundId, Long sellerId, Long handlerId) {
         checkRefundBelongsToSeller(refundId, sellerId);
         approveRefund(refundId, handlerId);
     }
 
+    /** 商家驳回退款 */
     @Override
     public void rejectMerchantRefund(Long refundId, Long sellerId, Long handlerId, String rejectReason) {
         checkRefundBelongsToSeller(refundId, sellerId);
         rejectRefund(refundId, handlerId, rejectReason);
     }
 
+    /** 商家完成退款 */
     @Override
     public void completeMerchantRefund(Long refundId, Long sellerId, Long handlerId) {
         checkRefundBelongsToSeller(refundId, sellerId);
         completeRefund(refundId, handlerId);
     }
 
+    /** 商家确认收到退货 */
     @Override
     public void confirmMerchantReceive(Long refundId, Long sellerId, Long handlerId) {
         checkRefundBelongsToSeller(refundId, sellerId);
         confirmReceive(refundId, handlerId);
     }
 
+    /** 校验退款是否属于该商家 */
     private void checkRefundBelongsToSeller(Long refundId, Long sellerId) {
         Refund refund = refundMapper.selectById(refundId);
         if (refund == null) {

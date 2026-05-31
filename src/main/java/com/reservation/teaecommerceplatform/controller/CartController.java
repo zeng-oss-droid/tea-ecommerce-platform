@@ -18,6 +18,7 @@ public class CartController {
     @Autowired
     private CartService cartService;
 
+    /** 获取当前登录用户的购物车列表 */
     @GetMapping("/list")
     public Result<List<Cart>> getCartList(HttpServletRequest request) {
         try {
@@ -29,6 +30,7 @@ public class CartController {
         }
     }
 
+    /** 添加商品到购物车，请求体：{@code { "productId": 1, "quantity": 2 }} */
     @PostMapping("/add")
     public Result<Void> addToCart(@RequestBody Map<String, Object> params, HttpServletRequest request) {
         try {
@@ -42,6 +44,7 @@ public class CartController {
         }
     }
 
+    /** 更新购物车商品数量，请求体：{@code { "cartId": 1, "quantity": 3 }} */
     @PutMapping("/update")
     public Result<Void> updateQuantity(@RequestBody Map<String, Object> params) {
         try {
@@ -54,6 +57,7 @@ public class CartController {
         }
     }
 
+    /** 从购物车中移除指定商品 */
     @DeleteMapping("/remove/{cartId}")
     public Result<Void> removeFromCart(@PathVariable Long cartId) {
         try {
@@ -64,6 +68,7 @@ public class CartController {
         }
     }
 
+    /** 清空当前登录用户的购物车 */
     @DeleteMapping("/clear")
     public Result<Void> clearCart(HttpServletRequest request) {
         try {

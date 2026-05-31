@@ -37,6 +37,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private AddressMapper addressMapper;
 
+    /** 创建订单，扣库存并清空购物车 */
     @Override
     @Transactional
     public Order createOrder(Long userId, Long addressId, String remark, List<Long> cartIds) {
@@ -166,16 +167,19 @@ public class OrderServiceImpl implements OrderService {
         return order;
     }
 
+    /** 查询用户订单列表 */
     @Override
     public List<Order> getOrderList(Long userId) {
         return orderMapper.selectByUserId(userId);
     }
 
+    /** 查询订单详情 */
     @Override
     public Order getOrderDetail(Long orderId) {
         return orderMapper.selectById(orderId);
     }
 
+    /** 模拟支付订单 */
     @Override
     @Transactional
     public void payOrder(Long orderId, Integer payType) {
@@ -193,6 +197,7 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.update(order);
     }
 
+    /** 取消待支付订单，恢复库存 */
     @Override
     @Transactional
     public void cancelOrder(Long orderId) {
@@ -214,6 +219,7 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.update(order);
     }
 
+    /** 确认收货，累加销量 */
     @Override
     @Transactional
     public void confirmReceipt(Long orderId) {
@@ -235,11 +241,12 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.update(order);
     }
 
-    //生成随机数订单号
+    /** 生成订单号 */
     private String generateOrderNo() {
         return "TEA" + System.currentTimeMillis() + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
     }
 
+    /** 管理端分页查询全站订单 */
     @Override
     public Map<String, Object> getAllOrders(Integer pageNum, Integer pageSize, String keyword, Integer status) {
         int offset = (pageNum - 1) * pageSize;
@@ -256,11 +263,13 @@ public class OrderServiceImpl implements OrderService {
         return result;
     }
 
+    /** 管理员修改订单状态 */
     @Override
     public void updateOrderStatus(Long orderId, Integer status) {
         orderMapper.updateStatus(orderId, status);
     }
 
+    /** 商家分页查询本店订单 */
     @Override
     public Map<String, Object> getMerchantOrders(Long sellerId, Integer pageNum, Integer pageSize, String keyword, Integer status) {
         int offset = (pageNum - 1) * pageSize;
@@ -276,6 +285,7 @@ public class OrderServiceImpl implements OrderService {
         return result;
     }
 
+    /** 商家修改本店订单状态 */
     @Override
     public void updateMerchantOrderStatus(Long sellerId, Long orderId, Integer status) {
         int count = orderItemMapper.countByOrderIdAndSellerId(orderId, sellerId);

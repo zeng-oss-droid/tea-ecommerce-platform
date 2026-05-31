@@ -9,11 +9,17 @@ import java.util.Map;
  * 订单全生命周期 + 后台/商家维度的分页查询与状态流转。
  */
 public interface OrderService {
+    /** 创建订单，扣库存并清空购物车 */
     Order createOrder(Long userId, Long addressId, String remark, List<Long> cartIds);
+    /** 查询用户订单列表 */
     List<Order> getOrderList(Long userId);
+    /** 查询订单详情 */
     Order getOrderDetail(Long orderId);
+    /** 模拟支付订单 */
     void payOrder(Long orderId, Integer payType);
+    /** 取消待支付订单，恢复库存 */
     void cancelOrder(Long orderId);
+    /** 确认收货，累加销量 */
     void confirmReceipt(Long orderId);
 
     /** 管理端：全站订单分页 */

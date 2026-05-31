@@ -18,6 +18,7 @@ public class ReviewController {
     @Autowired
     private ReviewService reviewService;
     
+    /** 买家提交商品评价，请求体含 orderId、orderItemId、productId、rating、content、images */
     @PostMapping("/create")
     public Result<Review> createReview(@RequestBody Map<String, Object> params, HttpServletRequest request) {
         try {
@@ -40,6 +41,7 @@ public class ReviewController {
         }
     }
     
+    /** 分页查询指定商品的评价列表 */
     @GetMapping("/product/{productId}")
     public Result<Map<String, Object>> getReviewsByProduct(@PathVariable Long productId, 
                                                            @RequestParam(defaultValue = "1") Integer pageNum,
@@ -56,6 +58,7 @@ public class ReviewController {
         }
     }
     
+    /** 查询指定订单下的所有评价 */
     @GetMapping("/order/{orderId}")
     public Result<List<Review>> getReviewsByOrder(@PathVariable Long orderId) {
         try {
@@ -66,6 +69,7 @@ public class ReviewController {
         }
     }
     
+    /** 获取当前登录用户发表的所有评价 （未使用）*/
     @GetMapping("/my")
     public Result<List<Review>> getMyReviews(HttpServletRequest request) {
         try {

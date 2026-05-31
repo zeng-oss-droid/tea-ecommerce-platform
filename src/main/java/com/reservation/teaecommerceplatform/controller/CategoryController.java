@@ -16,6 +16,7 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
+    /** 获取所有商品分类列表（公开接口） */
     @GetMapping("/list")
     public Result<List<Category>> getList() {
         try {
@@ -26,6 +27,7 @@ public class CategoryController {
         }
     }
 
+    /** 根据分类 ID 查询分类详情 */
     @GetMapping("/{id}")
     public Result<Category> getById(@PathVariable Long id) {
         try {
@@ -36,6 +38,7 @@ public class CategoryController {
         }
     }
 
+    /** 新增商品分类（需管理员权限） */
     @PostMapping("/add")
     public Result<Void> add(@RequestBody Category category) {
         try {
@@ -46,6 +49,7 @@ public class CategoryController {
         }
     }
 
+    /** 更新商品分类信息（需管理员权限） */
     @PutMapping("/update")
     public Result<Void> update(@RequestBody Category category) {
         try {
@@ -56,6 +60,7 @@ public class CategoryController {
         }
     }
 
+    /** 根据分类 ID 删除商品分类（需管理员权限） */
     @DeleteMapping("/delete/{id}")
     public Result<Void> delete(@PathVariable Long id) {
         try {

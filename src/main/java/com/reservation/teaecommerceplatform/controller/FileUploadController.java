@@ -25,6 +25,7 @@ public class FileUploadController {
     @Value("${file.upload.url:http://localhost:8080/uploads/}")
     private String uploadUrl;
 
+    /** 上传单张图片，支持 jpg/jpeg/png/gif/webp，返回可访问的文件 URL */
     @PostMapping("/image")
     public Result<String> uploadImage(@RequestParam("file") MultipartFile file) {
         try {
@@ -65,6 +66,7 @@ public class FileUploadController {
         }
     }
 
+    /** 批量上传多张图片，返回所有成功上传的文件 URL 列表 */
     @PostMapping("/images")
     public Result<List<String>> uploadImages(@RequestParam("files") MultipartFile[] files) {
         try {

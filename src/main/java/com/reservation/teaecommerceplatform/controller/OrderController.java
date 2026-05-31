@@ -29,6 +29,7 @@ public class OrderController {
     @Autowired
     private OrderItemMapper orderItemMapper;
 
+    /** 创建订单，请求体含 addressId、remark、cartIds（选中的购物车项） */
     @PostMapping("/create")
     public Result<Order> createOrder(@RequestBody Map<String, Object> params, HttpServletRequest request) {
         try {
@@ -53,6 +54,7 @@ public class OrderController {
         }
     }
 
+    /** 获取当前登录用户的订单列表 */
     @GetMapping("/list")
     public Result<List<Order>> getOrderList(HttpServletRequest request) {
         try {
@@ -64,6 +66,7 @@ public class OrderController {
         }
     }
 
+    /** 获取订单详情，含订单主信息和订单项列表 */
     @GetMapping("/detail/{orderId}")
     public Result<Map<String, Object>> getOrderDetail(@PathVariable Long orderId) {
         try {
@@ -80,6 +83,7 @@ public class OrderController {
         }
     }
 
+    /** 模拟支付订单，请求体：{@code { "orderId": 1, "payType": 1 }} */
     @PostMapping("/pay")
     public Result<Void> payOrder(@RequestBody Map<String, Object> params) {
         try {
@@ -92,6 +96,7 @@ public class OrderController {
         }
     }
 
+    /** 取消未支付或待发货的订单 */
     @PostMapping("/cancel/{orderId}")
     public Result<Void> cancelOrder(@PathVariable Long orderId) {
         try {
@@ -102,6 +107,7 @@ public class OrderController {
         }
     }
 
+    /** 买家确认收货，订单完成 */
     @PostMapping("/confirm/{orderId}")
     public Result<Void> confirmReceipt(@PathVariable Long orderId) {
         try {

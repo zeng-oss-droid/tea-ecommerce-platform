@@ -24,6 +24,7 @@ public class ProductController {
     @Autowired
     private UserMapper userMapper;
 
+    /** 分页查询商品列表，支持分类、关键词、价格区间等筛选（可匿名访问） */
     @GetMapping("/list")
     public Result<?> getList(ProductQueryDTO queryDTO) {
         try {
@@ -33,6 +34,7 @@ public class ProductController {
         }
     }
 
+    /** 根据商品 ID 查询商品详情（可匿名访问） */
     @GetMapping("/detail/{id}")
     public Result<Product> getDetail(@PathVariable Long id) {
         try {
@@ -43,6 +45,7 @@ public class ProductController {
         }
     }
 
+    /** 新增商品（需管理员或商家权限，商家仅能添加自己的商品） */
     @PostMapping("/add")
     public Result<Void> add(@RequestBody Product product, HttpServletRequest request) {
         try {
@@ -55,6 +58,7 @@ public class ProductController {
         }
     }
 
+    /** 更新商品信息（需管理员或商家权限，商家仅能修改自己的商品） */
     @PutMapping("/update")
     public Result<Void> update(@RequestBody Product product, HttpServletRequest request) {
         try {
@@ -67,6 +71,7 @@ public class ProductController {
         }
     }
 
+    /** 删除商品（需管理员或商家权限，商家仅能删除自己的商品） */
     @DeleteMapping("/delete/{id}")
     public Result<Void> delete(@PathVariable Long id, HttpServletRequest request) {
         try {

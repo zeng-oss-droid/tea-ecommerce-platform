@@ -33,6 +33,7 @@ public class MerchantController {
     @Autowired
     private RefundService refundService;
 
+    /** 分页查询本店订单，支持 keyword 搜索和 status 状态筛选 */
     @GetMapping("/orders")
     public Result<Map<String, Object>> getMerchantOrders(
             @RequestParam(defaultValue = "1") Integer pageNum,
@@ -49,6 +50,7 @@ public class MerchantController {
         }
     }
 
+    /** 商家修改本店订单状态（如发货），请求体：{@code { "status": 3 }} */
     @PutMapping("/orders/{id}/status")
     public Result<Void> updateOrderStatus(@PathVariable Long id, @RequestBody Map<String, Integer> params, HttpServletRequest request) {
         try {
@@ -61,6 +63,7 @@ public class MerchantController {
         }
     }
 
+    /** 分页查询本店商品列表（含已下架商品） */
     @GetMapping("/products")
     public Result<Map<String, Object>> getMerchantProducts(ProductQueryDTO queryDTO, HttpServletRequest request) {
         try {
@@ -73,6 +76,7 @@ public class MerchantController {
         }
     }
 
+    /** 商家新增商品，自动绑定当前商家为卖家 */
     @PostMapping("/products")
     public Result<Void> addProduct(@RequestBody Product product, HttpServletRequest request) {
         try {
@@ -84,6 +88,7 @@ public class MerchantController {
         }
     }
 
+    /** 商家更新本店商品信息 */
     @PutMapping("/products")
     public Result<Void> updateProduct(@RequestBody Product product, HttpServletRequest request) {
         try {
@@ -95,6 +100,7 @@ public class MerchantController {
         }
     }
 
+    /** 商家删除本店商品 */
     @DeleteMapping("/products/{id}")
     public Result<Void> deleteProduct(@PathVariable Long id, HttpServletRequest request) {
         try {
@@ -106,6 +112,7 @@ public class MerchantController {
         }
     }
 
+    /** 分页查询本店退款申请，支持 keyword 搜索和 status 状态筛选 */
     @GetMapping("/refunds")
     public Result<Map<String, Object>> getMerchantRefunds(
             @RequestParam(defaultValue = "1") Integer pageNum,
@@ -121,6 +128,7 @@ public class MerchantController {
         }
     }
 
+    /** 商家审核通过退款申请 */
     @PostMapping("/refunds/{id}/approve")
     public Result<Void> approveRefund(@PathVariable Long id, HttpServletRequest request) {
         try {
@@ -132,6 +140,7 @@ public class MerchantController {
         }
     }
 
+    /** 商家驳回退款申请，请求体：{@code { "rejectReason": "..." }} */
     @PostMapping("/refunds/{id}/reject")
     public Result<Void> rejectRefund(@PathVariable Long id, @RequestBody Map<String, String> params, HttpServletRequest request) {
         try {
@@ -143,6 +152,7 @@ public class MerchantController {
         }
     }
 
+    /** 商家标记退款处理完成（等待买家退货） */
     @PostMapping("/refunds/{id}/complete")
     public Result<Void> completeRefund(@PathVariable Long id, HttpServletRequest request) {
         try {
@@ -154,6 +164,7 @@ public class MerchantController {
         }
     }
 
+    /** 商家确认收到退货，退款流程结束 */
     @PostMapping("/refunds/{id}/confirm-receive")
     public Result<Void> confirmReceive(@PathVariable Long id, HttpServletRequest request) {
         try {

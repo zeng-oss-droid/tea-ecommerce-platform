@@ -16,16 +16,19 @@ public class AddressServiceImpl implements AddressService {
     @Autowired
     private AddressMapper addressMapper;
 
+    /** 查询用户所有收货地址 */
     @Override
     public List<Address> getAddressList(Long userId) {
         return addressMapper.selectByUserId(userId);
     }
 
+    /** 根据ID查询地址 */
     @Override
     public Address getById(Long id) {
         return addressMapper.selectById(id);
     }
 
+    /** 新增地址，设置默认时取消其他默认 */
     @Override
     @Transactional
     public void add(Address address) {
@@ -36,6 +39,7 @@ public class AddressServiceImpl implements AddressService {
         addressMapper.insert(address);
     }
 
+    /** 更新地址信息 */
     @Override
     @Transactional
     public void update(Address address) {
@@ -46,6 +50,7 @@ public class AddressServiceImpl implements AddressService {
         addressMapper.update(address);
     }
 
+    /** 设置默认地址 */
     @Override
     @Transactional
     public void setDefault(Long userId, Long addressId) {
@@ -53,6 +58,7 @@ public class AddressServiceImpl implements AddressService {
         addressMapper.updateDefault(userId, addressId);
     }
 
+    /** 删除地址 */
     @Override
     public void delete(Long id) {
         addressMapper.delete(id);

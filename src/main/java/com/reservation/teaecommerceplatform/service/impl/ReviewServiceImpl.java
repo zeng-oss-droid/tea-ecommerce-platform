@@ -28,6 +28,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Autowired
     private OrderItemMapper orderItemMapper;
     
+    /** 提交商品评价 */
     @Override
     @Transactional
     public Review createReview(Long userId, Long orderId, Long orderItemId, Long productId, Integer rating, String content, String images) {
@@ -69,22 +70,26 @@ public class ReviewServiceImpl implements ReviewService {
         return review;
     }
     
+    /** 分页查询商品评价 */
     @Override
     public List<Review> getReviewsByProductId(Long productId, Integer pageNum, Integer pageSize) {
         int offset = (pageNum - 1) * pageSize;
         return reviewMapper.selectByProductId(productId, offset, pageSize);
     }
     
+    /** 查询订单下的评价 */
     @Override
     public List<Review> getReviewsByOrderId(Long orderId) {
         return reviewMapper.selectByOrderId(orderId);
     }
     
+    /** 查询我的评价 */
     @Override
     public List<Review> getMyReviews(Long userId) {
         return reviewMapper.selectByUserId(userId);
     }
     
+    /** 管理端分页查询全站评价 */
     @Override
     public Map<String, Object> getAllReviews(Integer pageNum, Integer pageSize, String keyword, Integer status) {
         int offset = (pageNum - 1) * pageSize;
@@ -100,11 +105,13 @@ public class ReviewServiceImpl implements ReviewService {
         return result;
     }
     
+    /** 修改评价审核状态 */
     @Override
     public void updateReviewStatus(Long reviewId, Integer status) {
         reviewMapper.updateStatus(reviewId, status);
     }
     
+    /** 管理员回复评价 */
     @Override
     public void replyReview(Long reviewId, String reply) {
         Review review = reviewMapper.selectById(reviewId);
@@ -116,6 +123,7 @@ public class ReviewServiceImpl implements ReviewService {
         reviewMapper.update(review);
     }
     
+    /** 删除评价 */
     @Override
     public void deleteReview(Long reviewId) {
         reviewMapper.delete(reviewId);

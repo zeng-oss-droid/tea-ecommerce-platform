@@ -28,6 +28,7 @@ public class UserServiceImpl implements UserService {
 
     // ==================== 前台：账号与资料 ====================
 
+    /** 用户注册 */
     @Override
     public User register(UserRegisterDTO registerDTO) {
         // 检查用户名是否已存在
@@ -53,6 +54,7 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    /** 用户登录，返回JWT */
     @Override
     public String login(UserLoginDTO loginDTO) {
         User user = userMapper.selectByUsername(loginDTO.getUsername());
@@ -72,11 +74,13 @@ public class UserServiceImpl implements UserService {
         return jwtUtil.generateToken(user.getId(), user.getUsername());
     }
 
+    /** 查询当前用户信息 */
     @Override
     public User getCurrentUser(Long userId) {
         return userMapper.selectById(userId);
     }
 
+    /** 更新用户资料 */
     @Override
     public User updateUser(Long userId, User user) {
         user.setId(userId);
@@ -84,6 +88,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.selectById(userId);
     }
 
+    /** 修改密码 */
     @Override
     public void updatePassword(Long userId, String oldPassword, String newPassword) {
         // 验证原密码
@@ -162,6 +167,7 @@ public class UserServiceImpl implements UserService {
 
     // ==================== 管理后台：用户与商家申请 ====================
 
+    /** 管理端分页查询用户列表 */
     @Override
     public Map<String, Object> getUserList(Integer pageNum, Integer pageSize, String keyword) {
         int offset = (pageNum - 1) * pageSize;
@@ -178,16 +184,19 @@ public class UserServiceImpl implements UserService {
         return result;
     }
 
+    /** 根据ID查询用户 */
     @Override
     public User getUserById(Long id) {
         return userMapper.selectById(id);
     }
 
+    /** 启用/禁用用户 */
     @Override
     public void updateUserStatus(Long id, Integer status) {
         userMapper.updateStatus(id, status);
     }
 
+    /** 修改用户角色 */
     @Override
     public void updateUserRole(Long id, Integer role) {
         User user = userMapper.selectById(id);
@@ -271,6 +280,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /** 删除用户 */
     @Override
     public void deleteUser(Long id) {
         userMapper.delete(id);

@@ -20,11 +20,13 @@ public class CartServiceImpl implements CartService {
     @Autowired
     private ProductMapper productMapper;
 
+    /** 查询用户购物车列表 */
     @Override
     public List<Cart> getCartList(Long userId) {
         return cartMapper.selectByUserId(userId);
     }
 
+    /** 添加商品到购物车，同款合并数量 */
     @Override
     public void addToCart(Long userId, Long productId, Integer quantity) {
         // 检查商品是否存在且有库存
@@ -55,6 +57,7 @@ public class CartServiceImpl implements CartService {
         }
     }
 
+    /** 更新购物车商品数量 */
     @Override
     public void updateQuantity(Long cartId, Integer quantity) {
         Cart cart = cartMapper.selectById(cartId);
@@ -70,11 +73,13 @@ public class CartServiceImpl implements CartService {
         cartMapper.updateQuantity(cartId, quantity);
     }
 
+    /** 移除购物车项 */
     @Override
     public void removeFromCart(Long cartId) {
         cartMapper.delete(cartId);
     }
 
+    /** 清空用户购物车 */
     @Override
     public void clearCart(Long userId) {
         cartMapper.deleteByUserId(userId);
